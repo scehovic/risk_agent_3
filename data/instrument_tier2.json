@@ -1,0 +1,365 @@
+{
+  "_comment": "Instrument Tier 2 — 26 severity questions (21 path-attached + 4 always-on + 1 derived) and their conditionals. SPEC §3.1, G-45: the rubric anchor IS the option; a person never picks a bare band word. FR-7: a band may be derived from a fact through a declared mapping — data, never code. Four conditional kinds per FR-8: severity_fired, always_fired, cross_tier, nested.",
+  "version": "2026-08-24.1",
+  "activated": true,
+
+  "severity_questions": [
+    {
+      "id": "t2_tpr_la_1", "path": "TPR_LA",
+      "text": "How much of our environment can the third party reach once they are in?",
+      "help": "Answer for the widest access any one of their people or systems holds, not the typical case.",
+      "anchors": {
+        "low": "One system, read-only, and only the records they need to do the job.",
+        "medium": "One system with the ability to change data, or several systems read-only.",
+        "high": "Several systems, or the ability to change configuration, or access to data belonging to customers other than the ones they support."
+      }
+    },
+    {
+      "id": "t2_tpr_ds_1", "path": "TPR_DS",
+      "text": "If the third party lost or exposed the data we give them, what would the consequence be?",
+      "help": "Think about the people in the data and the business, not about the vendor's embarrassment.",
+      "anchors": {
+        "low": "Information that is already public, or aggregated so no individual or deal is identifiable.",
+        "medium": "Internal business information, or personal details that would be uncomfortable but not harmful to disclose.",
+        "high": "Information that could cause a person real harm, or that would breach a regulatory or contractual obligation on disclosure."
+      }
+    },
+    {
+      "id": "t2_tpr_fp_1", "path": "TPR_FP",
+      "text": "How well do we know who sits behind the third party?",
+      "help": "The suppliers your supplier depends on. If you cannot name them, that is the answer.",
+      "anchors": {
+        "low": "We hold a current list of their suppliers, and the contract requires them to tell us before it changes.",
+        "medium": "We know the main ones, but the list is not maintained and changes reach us late or not at all.",
+        "high": "We do not know who they depend on, or they are entitled to change it without telling us."
+      }
+    },
+    {
+      "id": "t2_tpr_bc_1", "path": "TPR_BC",
+      "text": "What happens to the business if this third party stops delivering tomorrow?",
+      "help": "Assume no notice. Answer for what the business feels, not for what the contract says.",
+      "anchors": {
+        "low": "We could switch, absorb it manually, or wait — no customer would notice.",
+        "medium": "A visible degradation for days, with a manual workaround that holds for a while.",
+        "high": "A process stops. Customers or regulators would notice, and there is no workaround that holds."
+      }
+    },
+    {
+      "id": "t2_tpr_cc_1", "path": "TPR_CC",
+      "text": "How well does the contract carry our requirements?",
+      "help": "Whether the paperwork obliges them to do the things you are about to be asked about.",
+      "anchors": {
+        "low": "A current signed agreement with our standard security, privacy and audit terms in it.",
+        "medium": "An agreement exists but predates our current standard terms, or some clauses were negotiated away.",
+        "high": "No agreement yet, or their terms rather than ours, or nobody has read it against our requirements."
+      }
+    },
+    {
+      "id": "t2_tpr_os_1", "path": "TPR_OS",
+      "text": "How much does the delivery location change the risk?",
+      "help": "Consider legal reach, the ability to audit, and whether local law could compel access to our data.",
+      "anchors": {
+        "low": "A country we already operate in, with an established legal footing and adequacy for data transfers.",
+        "medium": "A country we have delivered from before, with transfer safeguards in place but limited ability to inspect on site.",
+        "high": "A country we have no presence in, where we cannot practically audit, or where local law could compel access to our data."
+      }
+    },
+
+    {
+      "id": "t2_aim_aa_1", "path": "AIM_AA",
+      "text": "How far can the AI act before a person sees what it did?",
+      "help": "The most consequential thing it can do on its own — not the typical thing.",
+      "anchors": {
+        "low": "It only suggests. Nothing happens until a person chooses to act on it.",
+        "medium": "It acts, but only in reversible ways, and a person reviews the record shortly afterwards.",
+        "high": "It acts on its own in ways that reach a customer, move money, or change a record that others rely on, and review is after the fact or absent."
+      }
+    },
+    {
+      "id": "t2_aim_mp_1", "path": "AIM_MP",
+      "text": "How much do we know about the model we are relying on?",
+      "help": "Where it came from, who can change it, and whether we would notice if it changed.",
+      "anchors": {
+        "low": "A named model and version from a supplier with published terms, pinned so it cannot change without us choosing to move.",
+        "medium": "A named commercial model that the supplier may update, with release notes we could read if we looked.",
+        "high": "We cannot name the model or its version, or it sits inside a product we cannot inspect, or it can change under us silently."
+      }
+    },
+    {
+      "id": "t2_aim_td_1", "path": "AIM_TD",
+      "text": "What could be exposed through what the model is given at the point of use?",
+      "help": "Prompts, retrieved documents and records sent with a request. Include anything the supplier could retain or use for their own training.",
+      "anchors": {
+        "low": "Only information that is already public, or data with identifiers removed before it is sent.",
+        "medium": "Internal business information, under terms that prohibit the supplier retaining or training on it.",
+        "high": "Personal or confidential information, or we cannot confirm the supplier will not retain or train on what we send."
+      }
+    },
+    {
+      "id": "t2_aim_or_1", "path": "AIM_OR",
+      "text": "What is the consequence if the AI is confidently wrong?",
+      "help": "Assume a plausible, well-written, wrong answer that nobody catches.",
+      "anchors": {
+        "low": "A person would notice immediately and the cost is a moment of their time.",
+        "medium": "It could reach a colleague and be acted on, but the error would surface within the normal course of work.",
+        "high": "It could reach a customer or a regulator, drive a decision about a person, or be indistinguishable from a correct answer."
+      }
+    },
+    {
+      "id": "t2_aim_ho_1", "path": "AIM_HO",
+      "text": "How well could someone see what the AI is doing and stop it?",
+      "help": "Both halves matter — being able to see, and being able to stop.",
+      "anchors": {
+        "low": "Every use is logged with its inputs and outputs, a named owner watches it, and a person can turn it off in minutes.",
+        "medium": "Use is logged and someone owns it, but nobody reviews routinely and turning it off needs a change.",
+        "high": "We could not reconstruct what it did, or nobody is named as owning it, or stopping it means an outage for something else."
+      }
+    },
+
+    {
+      "id": "t2_priv_pi_1", "path": "PRIV_PI",
+      "text": "How intrusive is this use of people's information, from their point of view?",
+      "help": "Judge it as the person in the data would, not as the project would.",
+      "anchors": {
+        "low": "Exactly what they gave it to us for, and they would expect it.",
+        "medium": "A related use they would probably accept if it were explained, but were not told about up front.",
+        "high": "A use they would be surprised or unhappy to learn about, or one that produces a decision about them."
+      }
+    },
+    {
+      "id": "t2_priv_pi_2", "path": "PRIV_PI",
+      "capture": false,
+      "derived": true,
+      "text": "Roughly how many people's information is involved?",
+      "help": "An order of magnitude is enough. This one you answer as a fact, and the band is worked out from it.",
+      "type": "single_select",
+      "options": [
+        { "id": "under_100", "label": "Fewer than 100 people" },
+        { "id": "100_10k", "label": "Between 100 and 10,000 people" },
+        { "id": "10k_1m", "label": "Between 10,000 and a million people" },
+        { "id": "over_1m", "label": "More than a million people" }
+      ],
+      "derivation": {
+        "from": "t2_priv_pi_2",
+        "map": { "under_100": "low", "100_10k": "medium", "10k_1m": "high", "over_1m": "high" },
+        "reason": "The band comes from the number of people you told us are involved."
+      }
+    },
+    {
+      "id": "t2_priv_sc_1", "path": "PRIV_SC",
+      "text": "How central is the specially protected information to what this activity does?",
+      "help": "Incidental presence still counts, but it is not the same as building the activity around it.",
+      "anchors": {
+        "low": "It could appear incidentally in free text, and the activity does not act on it.",
+        "medium": "It is present and used, but only to do the thing the person asked for.",
+        "high": "The activity is built around it — it drives a decision, a score, or who gets what."
+      }
+    },
+    {
+      "id": "t2_priv_xb_1", "path": "PRIV_XB",
+      "text": "How well protected is the transfer out of the country?",
+      "help": "What legally and practically protects the data once it is somewhere else.",
+      "anchors": {
+        "low": "To a country recognised as offering equivalent protection, under a current agreement.",
+        "medium": "To a country without that recognition, but with approved contractual safeguards signed and a transfer assessment done.",
+        "high": "No safeguards in place yet, or we do not know which countries it reaches, or local law could compel access."
+      }
+    },
+    {
+      "id": "t2_priv_rd_1", "path": "PRIV_RD",
+      "text": "How clearly is it decided when this information gets deleted?",
+      "help": "Deleted for real, including from backups and from any copy the third party holds.",
+      "anchors": {
+        "low": "A retention period is set, it is enforced automatically, and it covers every copy including the vendor's.",
+        "medium": "A retention period is set but deletion is manual, or it does not yet cover backups or vendor copies.",
+        "high": "Nothing is decided, or the answer is that we keep it indefinitely."
+      }
+    },
+    {
+      "id": "t2_priv_ir_1", "path": "PRIV_IR",
+      "text": "How well could we answer a person asking what we hold about them?",
+      "help": "Including correcting it, and deleting it if they are entitled to that.",
+      "anchors": {
+        "low": "We can find, correct, export and delete an individual's records within the required time, in this system.",
+        "medium": "We could do it, but it needs someone manual and would take real effort inside the deadline.",
+        "high": "We could not reliably find everything we hold about one person, or a vendor copy would be missed."
+      }
+    },
+
+    {
+      "id": "t2_sec_pa_1", "path": "SEC_PA",
+      "text": "How well controlled is privileged access to this system?",
+      "help": "Privileged means being able to change the system or read all of its data.",
+      "anchors": {
+        "low": "Named individual accounts only, issued through a vault, time-limited, with every session recorded.",
+        "medium": "Named accounts with strong authentication, but standing rather than time-limited, and sessions are not recorded.",
+        "high": "Accounts shared between people, or credentials that do not expire, or nobody could list who holds privileged access today."
+      }
+    },
+    {
+      "id": "t2_sec_ie_1", "path": "SEC_IE",
+      "text": "How exposed is the system at its boundary?",
+      "help": "What an unauthenticated stranger on the internet can reach.",
+      "anchors": {
+        "low": "Nothing is reachable without authenticating, and it sits behind a gateway that filters and rate-limits.",
+        "medium": "A login page and documented APIs are public, behind a gateway, with monitoring in place.",
+        "high": "Administrative interfaces, file uploads or unauthenticated endpoints are reachable from the internet, or nobody has confirmed what is exposed."
+      }
+    },
+    {
+      "id": "t2_sec_ld_1", "path": "SEC_LD",
+      "text": "How well would we be able to reconstruct what happened after an incident?",
+      "help": "Assume you are asked, six months later, who accessed a particular record and when.",
+      "anchors": {
+        "low": "Access and change logs go to a central store, are retained for the required period, and cannot be altered by the people they record.",
+        "medium": "Logs exist and are retained, but they stay local to the system and nobody watches them.",
+        "high": "Logging is partial or absent, retained for days, or the people with privileged access could remove their own traces."
+      }
+    },
+    {
+      "id": "t2_sec_rb_1", "path": "SEC_RB",
+      "text": "How confident are we that we could actually get this back?",
+      "help": "Confidence should come from a restore that has been performed, not from a backup job that reports success.",
+      "anchors": {
+        "low": "Backups are taken, held separately, and a restore has been tested within the last year against the recovery time the business expects.",
+        "medium": "Backups are taken and held separately, but a restore has never been tested end to end.",
+        "high": "We rely on the vendor's word, or backups are in the same place as the system, or nobody knows what the recovery time really is."
+      }
+    },
+    {
+      "id": "t2_sec_cr_1", "path": "SEC_CR",
+      "text": "How controlled is the path from a change to production?",
+      "help": "Who can put a change live, and what stands between them and doing it.",
+      "anchors": {
+        "low": "Every change is reviewed by someone else, tested automatically, and released through a pipeline nobody can bypass.",
+        "medium": "Changes are reviewed and released through a pipeline, but someone can deploy directly in an emergency.",
+        "high": "Changes can go live without another person seeing them, or releases are manual, or there is no record of what was deployed when."
+      }
+    },
+
+    {
+      "id": "t2_always_1", "always_on": true,
+      "text": "How critical is this activity to the business?",
+      "help": "Asked of every activity, whatever else it touches.",
+      "anchors": {
+        "low": "A convenience. If it stopped, the affected team would work around it and nobody outside would know.",
+        "medium": "An important process. If it stopped, a business unit would feel it within days.",
+        "high": "Something the business runs on. If it stopped, customers, revenue or a regulatory obligation would be affected immediately."
+      }
+    },
+    {
+      "id": "t2_always_2", "always_on": true,
+      "text": "How broadly will this be used?",
+      "help": "Reach, not importance.",
+      "anchors": {
+        "low": "One team, or a pilot with a named handful of users.",
+        "medium": "A business unit, or several teams across the organisation.",
+        "high": "The whole organisation, or anyone outside it."
+      }
+    },
+    {
+      "id": "t2_always_3", "always_on": true,
+      "text": "Who sees what this produces?",
+      "help": "The furthest the output travels, including indirectly.",
+      "anchors": {
+        "low": "Only the person who asked for it.",
+        "medium": "Colleagues, who may act on it as part of their work.",
+        "high": "Customers, the public, a regulator, or an external partner."
+      }
+    },
+    {
+      "id": "t2_always_4", "always_on": true,
+      "text": "If this went badly wrong, how material would it be?",
+      "help": "One bad day, at the worst plausible end. Financial, regulatory or reputational.",
+      "anchors": {
+        "low": "Absorbed inside a team's budget and forgotten in a week.",
+        "medium": "A cost or a complaint that a business unit would have to explain.",
+        "high": "A loss, a regulatory notification, or press coverage that reaches the executive."
+      }
+    }
+  ],
+
+  "conditionals": [
+    {
+      "id": "t2c_tpr_la_2", "kind": "severity_fired", "lead": "t2_tpr_la_1", "threshold": "medium",
+      "text": "How does the third party's access get removed when one of their people leaves?",
+      "help": "Only asked because their reach is Medium or wider. If you do not know their process, hand this off rather than guessing.",
+      "type": "single_select",
+      "options": [
+        { "id": "automatic", "label": "Automatically, from their own joiner-leaver process" },
+        { "id": "notify_us", "label": "They tell us and we remove it" },
+        { "id": "periodic_review", "label": "It comes out at the next access review" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t2c_tpr_la_3", "kind": "nested", "lead": "t2_tpr_la_1", "threshold": "medium",
+      "requires_sibling": { "op": "any_of", "q": "t2c_tpr_la_2", "values": ["periodic_review", "not_sure"] },
+      "text": "How long could a leaver's access stay live?",
+      "help": "Asked because removal depends on a review rather than on their leaving. An estimate is fine.",
+      "type": "single_select",
+      "options": [
+        { "id": "days", "label": "Days" },
+        { "id": "weeks", "label": "Weeks" },
+        { "id": "quarter_plus", "label": "A quarter or more" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t2c_aim_aa_2", "kind": "cross_tier", "lead": "t2_aim_aa_1", "threshold": "medium",
+      "requires_tier1": { "op": "includes", "q": "t1_aim_1", "value": "takes_actions" },
+      "text": "What is the largest action the AI can take without a person approving it?",
+      "help": "Asked because it acts in other systems on its own. Describe the limit as it is configured today, not as intended.",
+      "type": "long_text"
+    },
+    {
+      "id": "t2c_aim_td_2", "kind": "always_fired", "path": "AIM_TD",
+      "text": "Does the supplier's agreement prohibit them retaining or training on what we send?",
+      "help": "Asked whenever the model sees our data, whatever the severity. This is a fact about the contract, not a judgement.",
+      "type": "single_select",
+      "options": [
+        { "id": "yes_written", "label": "Yes, and it is in writing" },
+        { "id": "yes_default_terms", "label": "Their published terms say so, but we have no specific agreement" },
+        { "id": "no", "label": "No" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t2c_priv_xb_2", "kind": "always_fired", "path": "PRIV_XB", "capture": true,
+      "text": "Which countries will the information reach?",
+      "help": "Every country where it is stored or viewed from. Recorded for the privacy office — it does not change your severity.",
+      "type": "text"
+    },
+    {
+      "id": "t2c_sec_pa_2", "kind": "severity_fired", "lead": "t2_sec_pa_1", "threshold": "medium",
+      "text": "How often is privileged access reviewed and reconfirmed?",
+      "help": "Asked because privileged access is Medium or looser. Reviewed means somebody confirmed each person still needs it.",
+      "type": "single_select",
+      "options": [
+        { "id": "quarterly", "label": "At least every quarter" },
+        { "id": "annually", "label": "About once a year" },
+        { "id": "never", "label": "It has never been reviewed" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t2c_sec_rb_2", "kind": "severity_fired", "lead": "t2_sec_rb_1", "threshold": "medium",
+      "text": "When was a restore last performed successfully?",
+      "help": "Asked because recovery confidence is Medium or lower. A backup job reporting success is not a restore.",
+      "type": "single_select",
+      "options": [
+        { "id": "under_12m", "label": "Within the last year" },
+        { "id": "over_12m", "label": "More than a year ago" },
+        { "id": "never", "label": "Never" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t2c_priv_sc_2", "kind": "cross_tier", "lead": "t2_priv_sc_1", "threshold": "medium",
+      "requires_tier1": { "op": "includes", "q": "t1_priv_1", "value": "children" },
+      "text": "How is a child's age established, and who consents on their behalf?",
+      "help": "Asked because children's information is involved and the use is Medium or more central.",
+      "type": "long_text"
+    }
+  ]
+}

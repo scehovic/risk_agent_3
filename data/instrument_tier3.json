@@ -1,0 +1,388 @@
+{
+  "_comment": "Instrument Tier 3 — 51 control objectives across 14 families, with their accumulation rules. SPEC §3.3/§3.4. Accumulation is expressed as conditions over the SAME engine as routing — there is no second evaluator. Every accumulated objective carries at least one human-readable reason (FR-10). Children fire only on parent Yes, subject to their own cross-tier condition (FR-13).",
+  "version": "2026-08-24.1",
+  "activated": true,
+
+  "objectives": [
+    { "id": "t3_iam_01", "family": "IAM", "name": "Unique named accounts",
+      "question": "Does everyone who uses this system have their own account, not one shared between people?",
+      "help": "A shared account means no action can be traced to a person. If any account is shared — including a vendor's — the honest answer is No or Partial.",
+      "accumulated_by": [
+        { "condition": { "op": "equals", "q": "t1_sec_gate", "value": "yes" }, "reason": "a system holds our data, so every action needs to be traceable to a person" },
+        { "condition": { "op": "includes", "q": "t1_tpr_2", "value": "shared_account" }, "reason": "you told us the third party shares one account between people" }
+      ] },
+    { "id": "t3_iam_02", "family": "IAM", "name": "Privileged credentials vaulted",
+      "question": "Are privileged credentials issued from a vault, time-limited, and never held permanently by a person?",
+      "help": "A vault issues access when it is needed and takes it back afterwards. Standing administrator passwords, however strong, are not this.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_sec_pa_1", "band": "medium" }, "reason": "privileged access is Medium or looser" },
+        { "condition": { "op": "includes", "q": "t1_tpr_2", "value": "admin_rights" }, "reason": "you told us the third party needs administrator or privileged rights" }
+      ],
+      "children": [
+        { "id": "t3_iam_02_c1", "question": "Which vault issues them?", "help": "The product name is enough.", "type": "text" },
+        { "id": "t3_iam_02_c2", "question": "For how long is a privileged session valid before it has to be requested again?", "help": "As configured today.", "type": "text" }
+      ] },
+    { "id": "t3_iam_03", "family": "IAM", "name": "Multi-factor authentication",
+      "question": "Does signing in require a second factor as well as a password?",
+      "help": "For everyone, including vendor staff and break-glass accounts.",
+      "accumulated_by": [
+        { "condition": { "op": "equals", "q": "t1_sec_gate", "value": "yes" }, "reason": "a system holds our data" },
+        { "condition": { "op": "severity_at_least", "q": "t2_sec_ie_1", "band": "medium" }, "reason": "the system's boundary exposure is Medium or higher" }
+      ] },
+    { "id": "t3_iam_04", "family": "IAM", "name": "Access recertification",
+      "question": "Does somebody periodically confirm that each person still needs the access they hold?",
+      "help": "Confirmed by the person accountable for the system or the data, not by the people who hold the access.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_sec_pa_1", "band": "medium" }, "reason": "privileged access is Medium or looser" },
+        { "condition": { "op": "any_of", "q": "t2c_sec_pa_2", "values": ["never", "not_sure"] }, "reason": "you told us privileged access has never been reviewed, or that you are not sure" }
+      ] },
+    { "id": "t3_iam_05", "family": "IAM", "name": "Leaver deprovisioning",
+      "question": "Is access removed automatically when somebody leaves or changes role?",
+      "help": "Automatically means driven by the joiner-leaver process, not by somebody remembering.",
+      "accumulated_by": [
+        { "condition": { "op": "equals", "q": "t1_sec_gate", "value": "yes" }, "reason": "a system holds our data" },
+        { "condition": { "op": "any_of", "q": "t2c_tpr_la_2", "values": ["periodic_review", "not_sure"] }, "reason": "you told us the third party's leavers come out at a review, or that you are not sure" }
+      ] },
+    { "id": "t3_iam_06", "family": "IAM", "name": "Third-party access through a controlled gateway",
+      "question": "Does the third party reach our systems only through a controlled gateway, rather than directly?",
+      "help": "A jump host, a broker, or a zero-trust proxy — something we own that sits between them and the system.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "TPR_LA" }, "reason": "the third party connects to our systems" },
+        { "condition": { "op": "includes", "q": "t1_tpr_2", "value": "vpn_network" }, "reason": "you told us they come onto our network over a VPN or private link" }
+      ] },
+
+    { "id": "t3_dp_01", "family": "Data Protection", "name": "Encryption in transit",
+      "question": "Is data encrypted every time it moves between components or organisations?",
+      "help": "Including internal hops and any file transfer to or from the third party.",
+      "accumulated_by": [
+        { "condition": { "op": "equals", "q": "t1_sec_gate", "value": "yes" }, "reason": "a system stores, processes or transmits our data" }
+      ] },
+    { "id": "t3_dp_02", "family": "Data Protection", "name": "Encryption at rest",
+      "question": "Is data encrypted where it is stored, including backups?",
+      "help": "Backups are the half people forget.",
+      "accumulated_by": [
+        { "condition": { "op": "any_of", "q": "data_classification", "values": ["confidential", "restricted"] }, "reason": "the most sensitive data involved is Confidential or Restricted" },
+        { "condition": { "op": "path_active", "path": "TPR_DS" }, "reason": "the third party holds our data" }
+      ] },
+    { "id": "t3_dp_03", "family": "Data Protection", "name": "Data minimisation",
+      "question": "Does this activity collect and pass on only the data it actually needs?",
+      "help": "If a whole record is sent where three fields would do, the answer is Partial.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "PRIV_PI" }, "reason": "information about people is involved" },
+        { "condition": { "op": "path_active", "path": "AIM_TD" }, "reason": "the model is given data at the point of use" }
+      ] },
+    { "id": "t3_dp_04", "family": "Data Protection", "name": "Key management",
+      "question": "Are the encryption keys managed in a key service, with rotation, and held apart from the data?",
+      "help": "A key in a configuration file or a repository is not managed.",
+      "accumulated_by": [
+        { "condition": { "op": "equals", "q": "data_classification", "value": "restricted" }, "reason": "Restricted data is involved" },
+        { "condition": { "op": "severity_at_least", "q": "t2_tpr_ds_1", "band": "high" }, "reason": "the consequence of the third party exposing our data is High" }
+      ] },
+    { "id": "t3_dp_05", "family": "Data Protection", "name": "Egress controls",
+      "question": "Is there a control that would stop sensitive data leaving through this activity by mistake?",
+      "help": "A block or an alert on bulk export, on an unexpected destination, or on sensitive content in an outbound request.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_aim_td_1", "band": "medium" }, "reason": "what the model is given at the point of use is Medium or more exposing" },
+        { "condition": { "op": "path_active", "path": "PRIV_XB" }, "reason": "information about people will cross a border" }
+      ] },
+
+    { "id": "t3_nb_01", "family": "Network & Boundary", "name": "Boundary filtering",
+      "question": "Does traffic from the internet pass through something that filters and rate-limits it before it reaches the system?",
+      "help": "A web application firewall or an API gateway. A load balancer alone is not this.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "SEC_IE" }, "reason": "the system is reachable from outside" }
+      ] },
+    { "id": "t3_nb_02", "family": "Network & Boundary", "name": "Segmentation",
+      "question": "Is this system separated from the rest of the network, so a compromise here does not reach everything else?",
+      "help": "Separate network, separate account, or enforced rules between them — not just a different server.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_sec_ie_1", "band": "medium" }, "reason": "boundary exposure is Medium or higher" },
+        { "condition": { "op": "severity_at_least", "q": "t2_tpr_la_1", "band": "high" }, "reason": "the third party's reach into our environment is High" }
+      ] },
+    { "id": "t3_nb_03", "family": "Network & Boundary", "name": "Known exposed surface",
+      "question": "Is there a current record of exactly what this system exposes to the internet?",
+      "help": "Somebody has looked from the outside recently and written down what answers.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "SEC_IE" }, "reason": "the system is reachable from outside" }
+      ] },
+    { "id": "t3_nb_04", "family": "Network & Boundary", "name": "Authenticated interfaces",
+      "question": "Does every interface require authentication, with no unauthenticated endpoint left reachable?",
+      "help": "Health checks and documentation pages count as endpoints.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "SEC_IE" }, "reason": "the system is reachable from outside" },
+        { "condition": { "op": "includes", "q": "t1_sec_1", "value": "partner_api" }, "reason": "partners call it over an API" }
+      ] },
+
+    { "id": "t3_log_01", "family": "Logging", "name": "Central log aggregation",
+      "question": "Do access and change logs go somewhere central, outside the reach of the people they record?",
+      "help": "If an administrator could delete the log of what they did, the answer is No.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "SEC_LD" }, "reason": "a system holds our data, so what happens to it has to be recordable" }
+      ] },
+    { "id": "t3_log_02", "family": "Logging", "name": "Privileged session recording",
+      "question": "Is what a privileged user does recorded, not just the fact that they signed in?",
+      "help": "The commands or the changes, not only the login event.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_sec_pa_1", "band": "medium" }, "reason": "privileged access is Medium or looser" },
+        { "condition": { "op": "severity_at_least", "q": "t2_tpr_la_1", "band": "medium" }, "reason": "the third party's reach into our environment is Medium or wider" }
+      ] },
+    { "id": "t3_log_03", "family": "Logging", "name": "Log retention",
+      "question": "Are logs kept long enough to investigate something discovered months later?",
+      "help": "Most obligations land between one and seven years. Days is not enough.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "SEC_LD" }, "reason": "an incident here would need reconstructing" },
+        { "condition": { "op": "severity_at_least", "q": "t2_sec_ld_1", "band": "medium" }, "reason": "our ability to reconstruct events is Medium or worse" }
+      ],
+      "children": [
+        { "id": "t3_log_03_c1", "question": "For how long?", "help": "As configured today, in months or years.", "type": "text" }
+      ] },
+    { "id": "t3_log_04", "family": "Logging", "name": "Alerting on anomalous access",
+      "question": "Would anyone be alerted if this system were accessed in an unusual way?",
+      "help": "Alerted means a person or a rota receives it, not that it appears in a dashboard nobody opens.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_sec_ld_1", "band": "medium" }, "reason": "our ability to reconstruct events is Medium or worse" },
+        { "condition": { "op": "severity_at_least", "q": "t2_always_1", "band": "high" }, "reason": "the activity is critical to the business" }
+      ] },
+
+    { "id": "t3_res_01", "family": "Resilience", "name": "Backups held separately",
+      "question": "Are backups held somewhere a problem with the system itself could not reach?",
+      "help": "A separate account, region or provider — and ideally immutable, so ransomware cannot encrypt them too.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "SEC_RB" }, "reason": "the business expects this back quickly, or a third party runs something we depend on" }
+      ] },
+    { "id": "t3_res_02", "family": "Resilience", "name": "Tested restore",
+      "question": "Has a restore been performed successfully, end to end, within the last year?",
+      "help": "A backup job reporting success is not a tested restore. If nobody has restored it, the answer is No.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "SEC_RB" }, "reason": "the business expects this back quickly" },
+        { "condition": { "op": "any_of", "q": "t2c_sec_rb_2", "values": ["over_12m", "never", "not_sure"] }, "reason": "you told us a restore has not been performed in the last year" }
+      ],
+      "children": [
+        { "id": "t3_res_02_c1", "question": "When, and how long did it take?", "help": "Approximate is fine.", "type": "text" }
+      ] },
+    { "id": "t3_res_03", "family": "Resilience", "name": "Documented recovery objectives",
+      "question": "Is there an agreed, written recovery time and data-loss tolerance for this activity?",
+      "help": "Agreed with the business, not assumed by the technical team.",
+      "accumulated_by": [
+        { "condition": { "op": "any_of", "q": "t1_sec_3", "values": ["under_1h", "under_1d"] }, "reason": "you told us the business needs this back within a day" },
+        { "condition": { "op": "severity_at_least", "q": "t2_always_1", "band": "medium" }, "reason": "business criticality is Medium or higher" }
+      ] },
+    { "id": "t3_res_04", "family": "Resilience", "name": "Vendor continuity assurance",
+      "question": "Have we seen evidence of the third party's own continuity and recovery arrangements?",
+      "help": "Their tested plan or an assurance report — not a clause promising they have one.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "TPR_BC" }, "reason": "the third party runs something we could not operate without" },
+        { "condition": { "op": "severity_at_least", "q": "t2_tpr_bc_1", "band": "medium" }, "reason": "losing this third party would be felt within days" }
+      ] },
+
+    { "id": "t3_ops_01", "family": "Ops", "name": "Named operational owner",
+      "question": "Is there a named team accountable for running this once it is live?",
+      "help": "A team and a rota, not the name of whoever built it.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_always_1", "band": "medium" }, "reason": "business criticality is Medium or higher" }
+      ] },
+    { "id": "t3_ops_02", "family": "Ops", "name": "Runbook and support route",
+      "question": "Is there a written runbook, and a route by which somebody gets woken up if it breaks?",
+      "help": "Written down somewhere a person on call at 3am could find it.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_always_1", "band": "high" }, "reason": "business criticality is High" },
+        { "condition": { "op": "any_of", "q": "t1_sec_3", "values": ["under_1h", "under_1d"] }, "reason": "you told us the business needs this back within a day" }
+      ] },
+    { "id": "t3_ops_03", "family": "Ops", "name": "Capacity and performance monitoring",
+      "question": "Is somebody watching whether this is keeping up, before users notice it is not?",
+      "help": "Monitoring with a threshold that alerts, rather than a graph.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_always_2", "band": "medium" }, "reason": "the activity is used across a business unit or wider" }
+      ] },
+
+    { "id": "t3_sdlc_01", "family": "SDLC", "name": "Peer review before release",
+      "question": "Does another person review every change before it reaches production?",
+      "help": "Reviewed by somebody other than the author, with no route around it.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "SEC_CR" }, "reason": "changes will be made and released" }
+      ] },
+    { "id": "t3_sdlc_02", "family": "SDLC", "name": "Automated test gate",
+      "question": "Do automated tests have to pass before a change can be released?",
+      "help": "Have to, not usually do.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_sec_cr_1", "band": "medium" }, "reason": "the path from change to production is Medium or looser" }
+      ] },
+    { "id": "t3_sdlc_03", "family": "SDLC", "name": "Dependency and secret scanning",
+      "question": "Is the code scanned for vulnerable dependencies and for credentials committed by mistake?",
+      "help": "On every change, not once at the start.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "SEC_CR" }, "reason": "changes will be made and released" },
+        { "condition": { "op": "path_active", "path": "SEC_IE" }, "reason": "the system is reachable from outside" }
+      ] },
+
+    { "id": "t3_aig_01", "family": "AI Governance", "name": "Model registered in the inventory",
+      "question": "Is this model recorded in the organisation's AI inventory, with a named owner?",
+      "help": "The register the AI governance office keeps. If you do not know whether it is there, that is a No — somebody will confirm.",
+      "accumulated_by": [
+        { "condition": { "op": "equals", "q": "t1_aim_gate", "value": "yes" }, "reason": "the activity uses AI" }
+      ],
+      "children": [
+        { "id": "t3_aig_01_c1", "question": "What is its entry reference?", "help": "The record id or name, as it appears in the inventory.", "type": "text" }
+      ] },
+    { "id": "t3_aig_02", "family": "AI Governance", "name": "Model version pinned",
+      "question": "Is a specific model version pinned, so it cannot change without us choosing to change it?",
+      "help": "If the supplier can update the model under you and you would not know, the answer is No.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "AIM_MP" }, "reason": "the model comes from outside our organisation" },
+        { "condition": { "op": "severity_at_least", "q": "t2_aim_mp_1", "band": "medium" }, "reason": "what we know about the model we rely on is Medium or less" }
+      ] },
+    { "id": "t3_aig_03", "family": "AI Governance", "name": "Output quality baseline",
+      "question": "Is there a measured baseline for how often the output is right, checked before release and after changes?",
+      "help": "A number from a test set, not an impression from a demo.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "AIM_OR" }, "reason": "the AI drafts or classifies something that travels onward" },
+        { "condition": { "op": "severity_at_least", "q": "t2_aim_or_1", "band": "medium" }, "reason": "the consequence of a confidently wrong output is Medium or higher" }
+      ] },
+    { "id": "t3_aig_04", "family": "AI Governance", "name": "Human review before consequential action",
+      "question": "Does a person approve anything the AI does that would affect a customer or a person's outcome?",
+      "help": "Approve beforehand. Seeing it afterwards is a different control — that one is logging.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_aim_aa_1", "band": "medium" }, "reason": "the AI can act before a person sees what it did" },
+        { "condition": { "op": "includes", "q": "t1_aim_1", "value": "decides_automatically" }, "reason": "you told us the AI makes a decision without a person in the loop" },
+        { "condition": { "op": "includes", "q": "t1_aim_1", "value": "classifies_ranks" }, "reason": "you told us the AI classifies, scores or ranks people or cases" }
+      ] },
+    { "id": "t3_aig_05", "family": "AI Governance", "name": "Ability to disable",
+      "question": "Can a person switch this off within minutes, without taking down something else?",
+      "help": "A configuration flag somebody on call can set, not a code change and a release.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "AIM_HO" }, "reason": "the activity uses AI, so somebody has to be able to stop it" },
+        { "condition": { "op": "severity_at_least", "q": "t2_aim_aa_1", "band": "high" }, "reason": "the AI acts on its own in ways that reach beyond the team" }
+      ] },
+    { "id": "t3_aig_06", "family": "AI Governance", "name": "Prompt and output logging",
+      "question": "Is what went into the model and what came out recorded, so a specific answer can be reconstructed later?",
+      "help": "Enough to answer 'why did it say that, to whom, and when'.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "AIM_HO" }, "reason": "the activity uses AI and its behaviour has to be reviewable" },
+        { "condition": { "op": "severity_at_least", "q": "t2_aim_or_1", "band": "medium" }, "reason": "the consequence of a wrong output is Medium or higher" }
+      ] },
+
+    { "id": "t3_comp_01", "family": "Compliance", "name": "Regulatory applicability assessed",
+      "question": "Has somebody confirmed which laws and regulations apply to this activity?",
+      "help": "Confirmed by legal or compliance, and written down.",
+      "accumulated_by": [
+        { "condition": { "op": "equals", "q": "t1_lrc_gate", "value": "yes" }, "reason": "you told us a specific law, regulation or contractual obligation applies" },
+        { "condition": { "op": "path_active", "path": "PRIV_SC" }, "reason": "specially protected information about people is involved" }
+      ] },
+    { "id": "t3_comp_02", "family": "Compliance", "name": "Record of processing",
+      "question": "Is this activity recorded in the register of how we process personal information?",
+      "help": "The record the privacy office maintains. It is their register, but somebody has to tell them.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "PRIV_PI" }, "reason": "information about people is involved" }
+      ] },
+    { "id": "t3_comp_03", "family": "Compliance", "name": "Contract carries our requirements",
+      "question": "Does the signed agreement oblige the third party to the security and privacy requirements we rely on?",
+      "help": "Our terms, current, and read by somebody against this activity.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "TPR_CC" }, "reason": "a third party is involved" },
+        { "condition": { "op": "severity_at_least", "q": "t2_tpr_cc_1", "band": "medium" }, "reason": "how well the contract carries our requirements is Medium or worse" }
+      ] },
+
+    { "id": "t3_priv_01", "family": "Privacy", "name": "Lawful basis recorded",
+      "question": "Is the reason we are allowed to use this information written down and agreed with the privacy office?",
+      "help": "Consent, contract, legal obligation or legitimate interests — the specific one, agreed, not assumed.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "PRIV_PI" }, "reason": "information about people is involved" }
+      ] },
+    { "id": "t3_priv_02", "family": "Privacy", "name": "People are told",
+      "question": "Have the people whose information this is been told about this use, in words they would understand?",
+      "help": "A privacy notice that actually covers this use, not one that predates it.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_priv_pi_1", "band": "medium" }, "reason": "the use is Medium or more intrusive from the person's point of view" }
+      ] },
+    { "id": "t3_priv_03", "family": "Privacy", "name": "Retention enforced",
+      "question": "Is there a retention period that is actually enforced, covering backups and any vendor copy?",
+      "help": "Enforced means something deletes it, not that a policy says it should be deleted.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "PRIV_RD" }, "reason": "information about people is involved, so how long it is kept has to be decided" },
+        { "condition": { "op": "severity_at_least", "q": "t2_priv_rd_1", "band": "medium" }, "reason": "how clearly deletion is decided is Medium or worse" }
+      ] },
+    { "id": "t3_priv_04", "family": "Privacy", "name": "Individual rights can be fulfilled",
+      "question": "Could we find, correct, export and delete one person's information in this system within the required time?",
+      "help": "Including any copy the third party holds.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "PRIV_IR" }, "reason": "identifiable people are involved and can ask what we hold about them" }
+      ] },
+    { "id": "t3_priv_05", "family": "Privacy", "name": "Transfer safeguards in place",
+      "question": "Are approved safeguards signed and a transfer assessment completed for every country this reaches?",
+      "help": "Signed, not drafted. And for every country, not the main one.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "PRIV_XB" }, "reason": "information about people will leave the country it is held in" },
+        { "condition": { "op": "severity_at_least", "q": "t2_priv_xb_1", "band": "medium" }, "reason": "how well protected the transfer is comes out at Medium or worse" }
+      ] },
+
+    { "id": "t3_eth_01", "family": "Ethics", "name": "Differential outcomes examined",
+      "question": "Has somebody checked whether this treats comparable people differently, and looked at why?",
+      "help": "Checked with data, on the groups the law protects, and written down.",
+      "accumulated_by": [
+        { "condition": { "op": "includes", "q": "t1_aim_1", "value": "classifies_ranks" }, "reason": "you told us the AI classifies, scores or ranks people or cases" },
+        { "condition": { "op": "severity_at_least", "q": "t2_priv_sc_1", "band": "high" }, "reason": "specially protected information drives a decision or an outcome" }
+      ] },
+    { "id": "t3_eth_02", "family": "Ethics", "name": "Route to challenge an outcome",
+      "question": "Can a person affected by this reach a human being who can look again at their case?",
+      "help": "A route they can actually find and use, with somebody empowered to change the answer.",
+      "accumulated_by": [
+        { "condition": { "op": "includes", "q": "t1_aim_1", "value": "decides_automatically" }, "reason": "you told us the AI makes a decision without a person in the loop" },
+        { "condition": { "op": "equals", "q": "t1_eth_gate", "value": "yes" }, "reason": "you told us this could affect people in a way they would object to" }
+      ] },
+
+    { "id": "t3_gov_01", "family": "Governance", "name": "Accountable owner of record",
+      "question": "Is one named person accountable for this activity's risk, and do they know it?",
+      "help": "Named, senior enough to make the call, and aware.",
+      "accumulated_by": [
+        { "condition": { "op": "always" }, "reason": "Governance & Oversight applies to every activity" }
+      ] },
+    { "id": "t3_gov_02", "family": "Governance", "name": "Decision recorded at a forum",
+      "question": "Will the decision to proceed be recorded somewhere other than an email thread?",
+      "help": "A governance forum, a committee, or a written approval with a date and a name.",
+      "accumulated_by": [
+        { "condition": { "op": "always" }, "reason": "Governance & Oversight applies to every activity" },
+        { "condition": { "op": "severity_at_least", "q": "t2_always_4", "band": "high" }, "reason": "the material impact if this went wrong is High" }
+      ] },
+
+    { "id": "t3_hr_01", "family": "HR", "name": "Screening for privileged staff",
+      "question": "Have the people holding privileged access been screened to the standard our policy requires?",
+      "help": "Including the third party's staff, which is usually a contractual obligation rather than something we do ourselves.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_sec_pa_1", "band": "medium" }, "reason": "privileged access is Medium or looser" },
+        { "condition": { "op": "path_active", "path": "TPR_LA" }, "reason": "the third party's staff reach our systems" }
+      ] },
+
+    { "id": "t3_tp_01", "family": "Third-Party", "name": "Due diligence before engagement",
+      "question": "Has the third party's security and privacy posture been assessed before they were engaged?",
+      "help": "An assessment we did or a report we read — not their sales material.",
+      "accumulated_by": [
+        { "condition": { "op": "equals", "q": "t1_tpr_gate", "value": "yes" }, "reason": "a third party is involved" }
+      ],
+      "children": [
+        { "id": "t3_tp_01_c1", "question": "Did that assessment cover the location the work is delivered from?", "help": "Asked only because delivery is from outside our home country — due diligence scoped to a head office does not cover a delivery centre.", "type": "single_select",
+          "requires_tier1": { "op": "includes", "q": "t1_tpr_1", "value": "offshore_delivery" },
+          "options": [ { "id": "yes", "label": "Yes" }, { "id": "no", "label": "No" }, { "id": "not_sure", "label": "I'm not sure" } ] }
+      ] },
+    { "id": "t3_tp_02", "family": "Third-Party", "name": "Fourth parties disclosed",
+      "question": "Is the third party obliged to tell us who they depend on, before it changes?",
+      "help": "In the contract, with a current list we actually hold.",
+      "accumulated_by": [
+        { "condition": { "op": "path_active", "path": "TPR_FP" }, "reason": "the third party uses their own suppliers to deliver part of this" },
+        { "condition": { "op": "severity_at_least", "q": "t2_tpr_fp_1", "band": "medium" }, "reason": "how well we know who sits behind the third party is Medium or worse" }
+      ] },
+    { "id": "t3_tp_03", "family": "Third-Party", "name": "Right to assurance",
+      "question": "Can we obtain independent assurance about the third party's controls, or audit them ourselves?",
+      "help": "A current independent report, or a contractual right to audit that somebody has actually exercised.",
+      "accumulated_by": [
+        { "condition": { "op": "severity_at_least", "q": "t2_tpr_ds_1", "band": "medium" }, "reason": "the consequence of the third party exposing our data is Medium or higher" },
+        { "condition": { "op": "path_active", "path": "TPR_OS" }, "reason": "the work is delivered from outside our home country" },
+        { "condition": { "op": "severity_at_least", "q": "t2_tpr_os_1", "band": "medium" }, "reason": "the delivery location changes the risk by Medium or more" }
+      ],
+      "children": [
+        { "id": "t3_tp_03_c1", "question": "What assurance do we hold, and how recent is it?", "help": "The report name and its date.", "type": "text" },
+        { "id": "t3_tp_03_c2", "question": "Does that assurance cover the offshore delivery location specifically?", "help": "Asked only because delivery is from outside our home country — an assurance report scoped to head office does not cover a delivery centre.", "type": "single_select",
+          "requires_tier1": { "op": "includes", "q": "t1_tpr_1", "value": "offshore_delivery" },
+          "options": [ { "id": "yes", "label": "Yes" }, { "id": "no", "label": "No" }, { "id": "not_sure", "label": "I'm not sure" } ] }
+      ] }
+  ]
+}

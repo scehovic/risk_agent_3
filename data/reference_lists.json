@@ -1,0 +1,41 @@
+{
+  "_comment": "Versioned reference lists. SPEC FR-29 to FR-32, NFR-22, G-46 to G-48. Immutable once activated; an answer stores the LABEL AS DISPLAYED when chosen, so a later rename never changes what a past answer says. Off-list values are accepted (FR-30), stored distinguishably, bound to their assessment immediately, and enter the shared list only by admin ratification with actor and timestamp (FR-32). One deliberate exception: the people directory is OPERATIONAL, not versioned — an identity provider replaces it in production, so its rename-safety comes from the stored label alone (G-46).",
+  "version": "2026-08-24.1",
+  "activated": true,
+
+  "people": {
+    "operational": true,
+    "entries": [
+      { "id": "p.okonkwo",  "label": "Ada Okonkwo",     "role": "requester", "title": "Head of Contact Centre Operations" },
+      { "id": "p.lindqvist","label": "Nils Lindqvist",   "role": "requester", "title": "Principal Engineer, Customer Platforms" },
+      { "id": "p.raman",    "label": "Divya Raman",      "role": "assessor",  "risk_domain": "security",   "title": "Senior Risk Assessor, Security" },
+      { "id": "p.mbeki",    "label": "Thandi Mbeki",     "role": "assessor",  "risk_domain": "privacy",    "title": "Senior Risk Assessor, Data Privacy" },
+      { "id": "p.ferreira", "label": "Bruno Ferreira",   "role": "assessor",  "risk_domain": "ai_governance", "title": "Risk Assessor, AI Governance" },
+      { "id": "p.novak",    "label": "Petra Novak",      "role": "assessor",  "risk_domain": null,         "title": "Lead Risk Assessor (generalist)" },
+      { "id": "p.adeyemi",  "label": "Kayode Adeyemi",   "role": "admin",     "title": "Risk Platform Administrator" }
+    ]
+  },
+
+  "business_units": {
+    "list_version": "2026-06-01.1",
+    "entries": [
+      { "id": "bu.retail_ops",   "label": "Retail Operations" },
+      { "id": "bu.retail_bank",  "label": "Retail Banking" },
+      { "id": "bu.wealth",       "label": "Wealth Management" },
+      { "id": "bu.group_tech",   "label": "Group Technology" },
+      { "id": "bu.group_risk",   "label": "Group Risk & Compliance" },
+      { "id": "bu.hr",           "label": "People & Culture" }
+    ]
+  },
+
+  "vendors": {
+    "list_version": "2026-07-15.2",
+    "entries": [
+      { "id": "v.meridian",  "label": "Meridian Data Systems",  "ratified": true,  "ratified_by": "p.adeyemi", "ratified_at": "2026-04-02T09:15:00Z" },
+      { "id": "v.northwind", "label": "Northwind Analytics",    "ratified": true,  "ratified_by": "p.adeyemi", "ratified_at": "2026-02-11T14:40:00Z" },
+      { "id": "v.calder",    "label": "Calder Cloud",           "ratified": true,  "ratified_by": "p.adeyemi", "ratified_at": "2025-12-05T11:02:00Z" },
+      { "id": "v.solstice",  "label": "Solstice Language Labs",  "ratified": false, "proposed_by": "p.lindqvist", "proposed_at": "2026-08-19T16:28:00Z",
+        "note": "Off-list value typed by a requester on another assessment. Bound to that assessment immediately; not offered to anyone else until an admin ratifies it (FR-32)." }
+    ]
+  }
+}

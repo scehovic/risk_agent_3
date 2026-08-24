@@ -1,0 +1,121 @@
+{
+  "_comment": "The intake description rubric. SPEC §22.1, G-69, FR-43. THREE LAYERS AND ONLY ONE IS A MODEL. (1) The FLOOR is heuristic and local — it catches a product name, a fragment or keyboard noise with no model call and costs nothing. (2) SCORING is the model's entire job: 0, 1 or 2 per dimension against the anchors below, strictly on the presence of factual detail and NEVER on length. (3) EVERYTHING AFTER — the pass rule and the exact sentence a person reads for that dimension at that score — is deterministic and lives HERE, so the feedback is business copy edited in one place and never composed in code. The rubric is VISIBLE TO THE REQUESTER: the anchor it was scored against is shown alongside each ask, so the grade is never a black box. A score outside 0-2 is DROPPED, never clamped — clamping turns nonsense into a number somebody then acts on.",
+  "version": "2026-08-24.1",
+  "activated": true,
+
+  "never_blocks": true,
+  "never_blocks_note": "No agent, a slow agent, a wrong agent, a partial answer or a thrown error ALL PASS. A quality assistant that blocks submission has become a gate, and the mission is reducing friction. The suggestions sit beside the box, never in front of the button.",
+
+  "floor": {
+    "_comment": "Heuristic, local, no model call. A floor hit returns immediately with its own message and never reaches the model.",
+    "min_words": 8,
+    "min_chars": 40,
+    "min_vowel_ratio": 0.24,
+    "min_chars_to_judge_noise": 12,
+    "_vowel_ratio_note": "Running English prose sits near 0.38. Below 0.24 over enough characters to judge is not language. Checked BEFORE the length rule so a long string of keyboard noise is called what it is rather than called short.",
+    "checks": [
+      { "id": "empty", "when": "blank",
+        "message": "Nothing to look at yet. Two or three sentences about what this activity does is all it takes." },
+      { "id": "too_short", "when": "under_min",
+        "message": "That is shorter than we can work with. Say what the activity does, who uses it, and what data it touches — three sentences is plenty." },
+      { "id": "product_name_only", "when": "single_known_product",
+        "known_products": ["salesforce", "workday", "servicenow", "snowflake", "databricks", "sap", "oracle", "sharepoint", "jira", "confluence", "tableau", "powerbi", "power bi", "azure", "aws", "gcp", "openai", "copilot", "chatgpt", "bedrock", "sagemaker", "mulesoft", "kafka", "dynamics", "netsuite", "zendesk", "slack", "teams"],
+        "message": "A product name on its own does not describe an activity — the same product carries very different risk depending on what you do with it. Say what you will use it for, whose data goes into it, and who will use it." },
+      { "id": "no_verb", "when": "no_verb_present",
+        "message": "This reads as a label rather than a description. Say what the activity will do." },
+      { "id": "noise", "when": "not_language",
+        "message": "That does not look like a description yet. When you are ready, say what this activity does in your own words." }
+    ]
+  },
+
+  "dimensions": [
+    {
+      "id": "specificity",
+      "label": "What it actually does",
+      "anchors": {
+        "0": "No description of the activity itself — a name, a product, or a goal with no mechanism.",
+        "1": "A general description of the activity, but not what it does concretely or how.",
+        "2": "States concretely what the activity does, in terms someone unfamiliar with it could follow."
+      },
+      "feedback": {
+        "0": "Say what this activity actually does. Not the goal it serves — the thing it does.",
+        "1": "Add one concrete sentence about the mechanism: what happens, step by step, when this runs.",
+        "2": "Clear on what it does."
+      }
+    },
+    {
+      "id": "scope",
+      "label": "Who uses it and how widely",
+      "anchors": {
+        "0": "No indication of who uses this or how many.",
+        "1": "Names a user group but not its size or reach.",
+        "2": "Names who uses it and gives a sense of how many, or which part of the business."
+      },
+      "feedback": {
+        "0": "Say who will use this — one team, a business unit, or customers.",
+        "1": "Add roughly how many people, or which part of the business. It changes what you are asked next.",
+        "2": "Clear on who uses it."
+      }
+    },
+    {
+      "id": "data_handling",
+      "label": "What data is involved",
+      "anchors": {
+        "0": "No mention of data.",
+        "1": "Mentions data in general terms without saying whose it is or how sensitive.",
+        "2": "Says what data is involved, whose it is, and where it comes from or goes."
+      },
+      "feedback": {
+        "0": "Say what data this touches — whose information, and where it comes from.",
+        "1": "Be specific about whose data it is. 'Customer records' and 'aggregated statistics' route very differently.",
+        "2": "Clear on the data."
+      }
+    },
+    {
+      "id": "dependencies",
+      "label": "Who else is involved",
+      "anchors": {
+        "0": "No mention of any external party, system or platform.",
+        "1": "Mentions that others are involved without naming them or their role.",
+        "2": "Names the vendors, systems or teams involved and what each does."
+      },
+      "feedback": {
+        "0": "Say who else is involved — vendors, platforms, or another team's system. If it is entirely in-house, say that.",
+        "1": "Name the parties and say what each one does. A vendor who hosts data and a vendor who only advises are different risks.",
+        "2": "Clear on the dependencies."
+      }
+    },
+    {
+      "id": "outcomes",
+      "label": "What it produces and who sees it",
+      "anchors": {
+        "0": "No indication of what comes out of this or who receives it.",
+        "1": "States an output but not who acts on it or what follows.",
+        "2": "States what it produces, who receives it, and what they do as a result."
+      },
+      "feedback": {
+        "0": "Say what comes out of this and who sees it.",
+        "1": "Say who acts on the output and what they do with it. Whether a person decides or the system does is the most important fact in this whole assessment.",
+        "2": "Clear on the outcome."
+      }
+    }
+  ],
+
+  "pass_rule": {
+    "_comment": "Deterministic. Read from here, never computed in code.",
+    "max_score_per_dimension": 2,
+    "total_possible": 10,
+    "pass_total": 6,
+    "pass_requires_no_zero": true,
+    "bands": [
+      { "id": "strong", "min_total": 9, "label": "Well described",
+        "message": "This gives the assessment plenty to work from. Nothing needed." },
+      { "id": "adequate", "min_total": 6, "label": "Enough to work with",
+        "message": "Enough to start. The suggestions below would save you questions later, but you can move on." },
+      { "id": "thin", "min_total": 3, "label": "Thin",
+        "message": "You can carry on with this. Adding the detail below means fewer questions asked cold further in." },
+      { "id": "minimal", "min_total": 0, "label": "Very little to go on",
+        "message": "You can carry on with this — nothing is blocked. But almost every question after this one will have to be asked from scratch." }
+    ]
+  }
+}

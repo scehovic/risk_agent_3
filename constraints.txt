@@ -1,0 +1,23 @@
+# Shared dependency pins for the runtime image.
+#
+# WHY: `agent/requirements.txt` starts with `-c constraints.txt` and the Dockerfile copies
+# both before pip runs, so a rebuild months from now produces the image that was tested
+# rather than whatever pip resolves that day.
+#
+# Versions are RESOLVED, not chosen. Do not hand-edit one: strands-agents constrains mcp
+# (it requires >=1.11.0), so an arbitrary pin produces ResolutionImpossible and every image
+# build fails. Re-resolve instead, on the same platform the runtime uses:
+#
+#   docker run --rm --platform linux/arm64 python:3.12-slim \
+#     sh -c 'pip install -q strands-agents bedrock-agentcore mcp boto3 \
+#            aws-opentelemetry-distro && pip freeze'
+#
+# NOT YET RESOLVED — STATED RATHER THAN IMPLIED.
+# There is no Docker on the machine this was authored on, so this file is deliberately
+# EMPTY of pins rather than carrying versions nobody verified. An empty constraints file
+# is a no-op: the build resolves freely, exactly as it would without this file, and the
+# only thing lost is reproducibility. Run the command above before the first real deploy
+# and paste the output below this line.
+#
+# A pinned version somebody guessed is worse than a documented gap, because the gap gets
+# closed and the guess gets trusted.

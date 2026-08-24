@@ -1,0 +1,116 @@
+{
+  "_comment": "Five enterprise policies, seventeen clauses. SPEC §22.5, G-67, FR-41. Each clause carries ITS OWN WORDS and names the control questions it bears on. The alignment (`governs`) is AUTHORED DATA RATIFIED BY A HUMAN — never something a model decides while a page renders: a requester asking 'why am I being asked this?' is owed an authority, and an authority a model invented is not one. A clause with an empty `governs` is a COVERAGE GAP in the instrument, named rather than dropped. Policy text is quoted verbatim or not at all (§22.5).",
+  "version": "2026-08-24.1",
+  "activated": true,
+
+  "breach_rule": {
+    "_comment": "The deterministic pass. It stands alone with no model available (G-67).",
+    "breaching_answers": ["no", "partial"],
+    "never_a_breach": ["n_a", null],
+    "why_unanswered_is_never_a_breach": "Silence becoming non-compliance is the mirror image of the mistake never-guess exists to stop (§3.2.1).",
+    "why_na_is_never_a_breach": "Judging a control out of scope is a position a person took; testing it is the reviewer's job, not the platform's to pre-empt.",
+    "replaces_gap": true,
+    "why_replaces": "One fact, one finding, and the richer of the two — a breach replaces the bare control gap rather than joining it."
+  },
+
+  "policies": [
+    {
+      "id": "POL-IAM",
+      "name": "Identity and Access Management Standard",
+      "version": "4.2",
+      "in_force_from": "2026-01-15",
+      "owner": "Chief Information Security Officer",
+      "clauses": [
+        { "id": "IAM-2.1",
+          "text": "Every individual who accesses a corporate system shall do so using an account uniquely attributable to that individual. Accounts shall not be shared between individuals under any circumstances, including for third-party personnel and for temporary engagements.",
+          "governs": ["t3_iam_01"] },
+        { "id": "IAM-3.4",
+          "text": "Privileged credentials shall be issued from an approved credential vault on a time-limited basis. Standing privileged access shall not be granted to any individual, internal or external, without a documented exception approved by the Chief Information Security Officer.",
+          "governs": ["t3_iam_02"] },
+        { "id": "IAM-3.7",
+          "text": "Privileged entitlements shall be reviewed and reconfirmed by the accountable system owner no less frequently than once each quarter. Entitlements not reconfirmed within that period shall be revoked.",
+          "governs": ["t3_iam_04"] },
+        { "id": "IAM-5.1",
+          "text": "Authentication to any system holding data classified Confidential or above shall require at least two distinct factors. This requirement extends to break-glass and emergency accounts.",
+          "governs": ["t3_iam_03"] }
+      ]
+    },
+    {
+      "id": "POL-DP",
+      "name": "Data Protection Policy",
+      "version": "6.0",
+      "in_force_from": "2026-03-01",
+      "owner": "Chief Data Officer",
+      "clauses": [
+        { "id": "DP-4.2",
+          "text": "Data classified Internal or above shall be encrypted in transit using current approved protocols, including on connections internal to the corporate network.",
+          "governs": ["t3_dp_01"] },
+        { "id": "DP-4.3",
+          "text": "Data classified Confidential or above shall be encrypted at rest. This requirement applies equally to backup copies and to any copy held by a third party on the organisation's behalf.",
+          "governs": ["t3_dp_02"] },
+        { "id": "DP-6.1",
+          "text": "Encryption keys shall be held in an approved key management service, separated from the data they protect, and rotated on a defined schedule. Keys shall not be stored in source code, configuration files or artefact repositories.",
+          "governs": ["t3_dp_04"] },
+        { "id": "DP-8.5",
+          "text": "On termination of a third-party engagement, the organisation shall obtain written certification that all copies of its data, including derived and backup copies, have been destroyed.",
+          "governs": [],
+          "coverage_note": "No question in the pilot instrument asks about destruction certification at exit. This is a gap in what we ask, not a gap in the policy (§22.1 read backwards)."
+        }
+      ]
+    },
+    {
+      "id": "POL-TPR",
+      "name": "Third-Party Risk Management Policy",
+      "version": "3.1",
+      "in_force_from": "2025-11-01",
+      "owner": "Head of Third-Party Risk",
+      "clauses": [
+        { "id": "TPR-2.3",
+          "text": "The security and privacy posture of a third party shall be assessed and documented before the engagement commences. An engagement shall not proceed on the basis of vendor-supplied marketing material alone.",
+          "governs": ["t3_tp_01"] },
+        { "id": "TPR-4.1",
+          "text": "Contracts shall oblige the third party to maintain a current register of its own material suppliers and to notify the organisation in advance of any change to that register.",
+          "governs": ["t3_tp_02"] },
+        { "id": "TPR-5.2",
+          "text": "For any third party processing data classified Confidential or above, the organisation shall hold either a current independent assurance report or an exercised contractual right of audit. Where delivery is performed from a location other than the third party's principal place of business, the assurance shall cover that location.",
+          "governs": ["t3_tp_03"] }
+      ]
+    },
+    {
+      "id": "POL-AI",
+      "name": "Responsible AI Policy",
+      "version": "2.0",
+      "in_force_from": "2026-05-20",
+      "owner": "Chair, AI Governance Committee",
+      "clauses": [
+        { "id": "AI-3.1",
+          "text": "Every model deployed in support of a business process shall be recorded in the AI inventory before it is used in production, with a named accountable owner.",
+          "governs": ["t3_aig_01"] },
+        { "id": "AI-5.2",
+          "text": "Where a model's output contributes to a decision affecting an individual, a competent person shall review and approve that output before it takes effect. Post-hoc review does not satisfy this clause.",
+          "governs": ["t3_aig_04"] },
+        { "id": "AI-5.4",
+          "text": "Any model-driven capability shall be capable of being disabled by an authorised operator without requiring a code change or a release.",
+          "governs": ["t3_aig_05"] },
+        { "id": "AI-7.1",
+          "text": "A measured performance baseline shall be established before a model-driven capability is released, and re-measured after any change to the model, its prompts or its retrieved sources.",
+          "governs": ["t3_aig_03"] }
+      ]
+    },
+    {
+      "id": "POL-RES",
+      "name": "Operational Resilience Standard",
+      "version": "5.3",
+      "in_force_from": "2026-02-10",
+      "owner": "Chief Operating Officer",
+      "clauses": [
+        { "id": "RES-3.2",
+          "text": "A restoration from backup shall be performed and evidenced at least annually for every system supporting an important business service, and the elapsed time recorded against the agreed recovery time objective.",
+          "governs": ["t3_res_02"] },
+        { "id": "RES-4.1",
+          "text": "Backup copies shall be held in a location or account logically isolated from the system they protect, such that a compromise of that system cannot alter or delete them.",
+          "governs": ["t3_res_01"] }
+      ]
+    }
+  ]
+}

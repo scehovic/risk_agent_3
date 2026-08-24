@@ -1,0 +1,51 @@
+{
+  "_comment": "Control family -> risk domain map. SPEC G-60, FR-17. Attestation authority is derived from THE QUESTION BEING SIGNED, never from an objective the caller supplied — a permission check reading a value the requester chose is not a permission check. Validated on import: an UNMAPPED FAMILY FAILS THE BUILD rather than falling through to 'anyone may sign'. A generalist assessor (no risk domain) covers everything, so a question can never sit in a queue nobody reads.",
+  "version": "2026-08-24.1",
+  "activated": true,
+
+  "families": {
+    "IAM":                { "domain": "security",               "because": "identity and access controls are owned by the security office" },
+    "Data Protection":    { "domain": "security",               "because": "encryption and key management are owned by the security office" },
+    "Network & Boundary": { "domain": "security",               "because": "network exposure is owned by the security office" },
+    "Logging":            { "domain": "security",               "because": "detection and audit logging are owned by the security office" },
+    "SDLC":               { "domain": "security",               "because": "release integrity is owned by the security office" },
+    "Resilience":         { "domain": "operational_resilience", "because": "recovery and continuity are owned by the operational resilience office" },
+    "Ops":                { "domain": "operational_resilience", "because": "run-state ownership is assessed by the operational resilience office" },
+    "AI Governance":      { "domain": "ai_governance",          "because": "model controls are owned by the AI Governance Committee" },
+    "Privacy":            { "domain": "privacy",                "because": "controls over personal information are owned by the privacy office" },
+    "Compliance":         { "domain": "compliance",             "because": "regulatory applicability is owned by the compliance office" },
+    "Third-Party":        { "domain": "third_party",            "because": "vendor controls are owned by the third-party risk team" },
+    "Ethics":             { "domain": "ethics_conduct",         "because": "fairness and challenge routes are owned by the ethics and conduct office" },
+    "Governance":         { "domain": "governance",             "because": "accountability and decision records are owned by the governance office" },
+    "HR":                 { "domain": "people",                 "because": "personnel screening is owned by human resources" }
+  },
+
+  "domains": [
+    { "id": "security",               "label": "Security" },
+    { "id": "operational_resilience", "label": "Operational Resilience" },
+    { "id": "ai_governance",          "label": "AI Governance" },
+    { "id": "privacy",                "label": "Data Privacy" },
+    { "id": "compliance",             "label": "Legal & Compliance" },
+    { "id": "third_party",            "label": "Third-Party Risk" },
+    { "id": "ethics_conduct",         "label": "Ethics & Conduct" },
+    { "id": "governance",             "label": "Governance" },
+    { "id": "people",                 "label": "People" }
+  ],
+
+  "review_rubric": {
+    "_comment": "SPEC G-61, FR-38. A mechanical rubric over WHAT IS ON RECORD — never a model's confidence in its own output. Every criterion is a fact the reviewer can verify on the same screen. The band ORDERS THE QUEUE AND DOES NOTHING ELSE: it cannot gate, skip or pre-approve an attestation.",
+    "criteria": [
+      { "id": "unexplained_non_yes", "weight": 3, "text": "A Partial, No or N-A was recorded without a written note." },
+      { "id": "churned", "weight": 2, "text": "The answer has changed more than twice." },
+      { "id": "yes_without_detail", "weight": 2, "text": "A Yes was recorded but its detail questions were left unanswered." },
+      { "id": "handed_off", "weight": 1, "text": "The question was handed to somebody else to answer." },
+      { "id": "drafted_with_evidence", "weight": -1, "text": "The answer was drafted from a document and carries a verbatim quote." }
+    ],
+    "bands": [
+      { "id": "look_first", "min_score": 5, "label": "Look at this first" },
+      { "id": "check", "min_score": 2, "label": "Worth a check" },
+      { "id": "routine", "min_score": -99, "label": "Routine" }
+    ],
+    "disclaimer": "This ordering is a triage aid over what is on record. It does not gate, skip or pre-approve any attestation — every visible answer still needs yours."
+  }
+}

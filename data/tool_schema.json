@@ -1,0 +1,53 @@
+{
+  "_comment": "The Gateway tool schema, defined ONCE. Both `cdk/risk_stack.py` (which registers it on the Gateway target) and `tests/test_risk_mcp.py` (which asserts it matches the TOOLS dict in mcp/index.py) read this file. A schema like this easily ends up duplicated across the stack, the tool module and a template; one definition avoids the failure that follows, where the Gateway advertises a tool the Lambda does not implement and the error says nothing useful.",
+  "version": "2026-08-24.1",
+  "tools": [
+    {
+      "Name": "risk_route",
+      "Description": "Return what applies to this risk assessment and why: the active risk paths with the reasons that lit each one, the severities established so far, and the control objectives accumulated from them. Given a question id, also returns why that question is being asked, in one plain English sentence, plus the policy clause behind it.",
+      "InputSchema": {"Type": "object", "Properties": {
+        "assessment": {"Type": "object"},
+        "answers": {"Type": "object"},
+        "explain_question": {"Type": "string"}
+      }, "Required": []}
+    },
+    {
+      "Name": "risk_score_intake",
+      "Description": "Grade an intake description against the published rubric. Called with text alone it runs a local heuristic floor with no model call and, if the text passes the floor, returns the anchors to score each dimension against. Called again with those scores it returns the deterministic feedback a person reads. It never blocks submission.",
+      "InputSchema": {"Type": "object", "Properties": {
+        "text": {"Type": "string"},
+        "scores": {"Type": "object"}
+      }, "Required": ["text"]}
+    },
+    {
+      "Name": "risk_draft_verify",
+      "Description": "Put a proposed answer through the never-guess gate. Refuses a paraphrase, a quote stitched from fragments that never appeared together, a citation to a source that was never supplied, an abstention that still carries an answer, an inference with nothing to point at, and a draft that does not say why. A passing draft is returned unconfirmed and counts as an answer nowhere until a person accepts it.",
+      "InputSchema": {"Type": "object", "Properties": {
+        "draft": {"Type": "object"},
+        "assessment": {"Type": "object"}
+      }, "Required": ["draft"]}
+    },
+    {
+      "Name": "risk_check_policy",
+      "Description": "Return the policy clauses that require a control question, quoted verbatim with policy, clause reference and version. Called with no question it returns the full deterministic compliance pass instead: every non-compliance with the clause it breaches, every control gap, every enhancement, and the clauses this instrument asks nothing about.",
+      "InputSchema": {"Type": "object", "Properties": {
+        "assessment": {"Type": "object"},
+        "question": {"Type": "string"}
+      }, "Required": []}
+    },
+    {
+      "Name": "risk_build_report",
+      "Description": "Build the handoff report a risk assessor receives, derived entirely from the record: what applies and why, the severity profile, every control with its answer and the clause requiring it, every finding, what nobody answered, and where the instrument deliberately stops. Optionally vets an agent-written summary and two to four risk scenarios; a scenario citing anything not in the record is dropped.",
+      "InputSchema": {"Type": "object", "Properties": {
+        "assessment": {"Type": "object"},
+        "summary": {"Type": "string"},
+        "scenarios": {"Type": "array"}
+      }, "Required": []}
+    },
+    {
+      "Name": "risk_hello",
+      "Description": "Smoke test - proves Gateway to Lambda routing works for the risk-advisor segment, and reports whether the authored instrument is coherent.",
+      "InputSchema": {"Type": "object", "Properties": {"name": {"Type": "string"}}, "Required": []}
+    }
+  ]
+}

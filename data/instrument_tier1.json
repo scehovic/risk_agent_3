@@ -1,0 +1,623 @@
+{
+  "_comment": "Instrument Tier 1 — intake, the 11 category gates, and the 21 path activation rules. SPEC §3.1/§3.2, G-27 (wording is the owner's), G-50 (pilot depth), G-35, G-36, G-38. Versioned data: immutable once activated (§5.7). Changing this is a governance event, never a code change.",
+  "version": "2026-08-24.1",
+  "activated": true,
+
+  "intake": {
+    "sections": [
+      {
+        "id": "description",
+        "title": "What are you doing?",
+        "help": "Two or three sentences in your own words. This is the only place you describe the activity, and every question after it is shaped by what you write here.",
+        "fields": [
+          {
+            "id": "activity_name",
+            "text": "What is this activity called?",
+            "help": "The name your team uses for it. It does not need to be an official project code.",
+            "type": "text",
+            "required": true
+          },
+          {
+            "id": "activity_description",
+            "text": "In your own words, what is this activity and what will it do?",
+            "help": "Say what it does, who uses it, what data it touches and who else is involved. Detail here saves you questions later — this is the one answer the whole assessment reads from.",
+            "type": "long_text",
+            "required": true,
+            "graded": true
+          },
+          {
+            "id": "launch_date",
+            "text": "When do you expect this to go live?",
+            "help": "An approximate date is fine. This is used to sequence review, not to judge the activity.",
+            "type": "date",
+            "required": false
+          }
+        ]
+      },
+      {
+        "id": "ownership",
+        "title": "Who owns it?",
+        "help": "The people a reviewer would contact. Choose from the list; if someone is missing you can still type them in.",
+        "fields": [
+          {
+            "id": "business_owner",
+            "text": "Who is accountable for this activity?",
+            "help": "The person who would answer for it at a governance forum — usually not the person filling this in.",
+            "type": "reference",
+            "reference_list": "people",
+            "required": true
+          },
+          {
+            "id": "business_unit",
+            "text": "Which part of the business is this for?",
+            "help": "The unit that benefits from the activity, not the unit building it.",
+            "type": "reference",
+            "reference_list": "business_units",
+            "required": true
+          },
+          {
+            "id": "technical_contact",
+            "text": "Who can answer technical questions about it?",
+            "help": "Leave blank if that is you.",
+            "type": "reference",
+            "reference_list": "people",
+            "required": false
+          }
+        ]
+      },
+      {
+        "id": "categorization",
+        "title": "What kind of activity is it?",
+        "help": "Four facts about your own project. Nothing here is a classification against our taxonomy — G-20.",
+        "fields": [
+          {
+            "id": "initiative_type",
+            "text": "Is this something new, or a change to something that already exists?",
+            "help": "A change still needs assessing — what changed is what we look at.",
+            "type": "single_select",
+            "options": [
+              { "id": "new", "label": "Something new" },
+              { "id": "update", "label": "A change to something we already run" }
+            ],
+            "required": true
+          },
+          {
+            "id": "prior_work_pointer",
+            "text": "Is there an earlier assessment for the thing you are changing?",
+            "help": "A name or reference is enough. Leave blank if you do not know of one — we will look.",
+            "type": "text",
+            "required": false,
+            "display_when": { "op": "equals", "q": "initiative_type", "value": "update" }
+          },
+          {
+            "id": "uses_ai",
+            "text": "Does this activity use AI or machine learning in any form?",
+            "help": "That includes a model you build, a model you call, and an AI feature inside a product you buy. If you are not sure, say so — someone will confirm it with you.",
+            "type": "single_select",
+            "options": [
+              { "id": "yes", "label": "Yes" },
+              { "id": "no", "label": "No" },
+              { "id": "not_sure", "label": "I'm not sure" }
+            ],
+            "required": true
+          },
+          {
+            "id": "ai_detail",
+            "text": "What does the AI actually do here?",
+            "help": "One sentence. For example: drafts a reply a person then sends, or scores an application and passes it to an underwriter.",
+            "type": "long_text",
+            "required": true,
+            "display_when": { "op": "equals", "q": "uses_ai", "value": "yes" }
+          },
+          {
+            "id": "third_party_involved",
+            "text": "Is a third party involved in delivering this — a vendor, a supplier, a partner?",
+            "help": "Answer No if everything is built and run in-house. An empty vendor box proves nothing, which is why we ask (G-35).",
+            "type": "single_select",
+            "options": [
+              { "id": "yes", "label": "Yes" },
+              { "id": "no", "label": "No, everything is in-house" },
+              { "id": "not_sure", "label": "I'm not sure" }
+            ],
+            "required": true
+          },
+          {
+            "id": "vendor_name",
+            "text": "Which third party?",
+            "help": "Choose from the list of vendors we already hold. If yours is not there, type it — it will be recorded against this assessment and reviewed before it joins the shared list.",
+            "type": "reference",
+            "reference_list": "vendors",
+            "required": true,
+            "display_when": { "op": "equals", "q": "third_party_involved", "value": "yes" }
+          }
+        ]
+      },
+      {
+        "id": "compliance_data",
+        "title": "What data and obligations are in play?",
+        "help": "Two questions. Both change what you are asked next, so they are worth a moment.",
+        "fields": [
+          {
+            "id": "data_classification",
+            "text": "What is the most sensitive data involved?",
+            "help": "Pick the highest band that applies, even if most of the data sits below it. The descriptions place almost any case.",
+            "type": "single_select",
+            "scale": true,
+            "options": [
+              { "id": "public", "label": "Public", "description": "Already published, or fine to publish. No harm if it were seen outside the organisation.", "rank": 1 },
+              { "id": "internal", "label": "Internal", "description": "Ordinary business information. Not for outside, but no specific harm from a single leak.", "rank": 2 },
+              { "id": "confidential", "label": "Confidential", "description": "Personal information, commercial terms, or anything where exposure would harm a person or a deal.", "rank": 3 },
+              { "id": "restricted", "label": "Restricted", "description": "The most sensitive we hold — special category personal data, credentials, material non-public information.", "rank": 4 }
+            ],
+            "required": true
+          },
+          {
+            "id": "procurement_status",
+            "text": "Has anything been bought or signed yet?",
+            "help": "An honest No is useful. It tells a reviewer whether there is still room to change terms.",
+            "type": "single_select",
+            "options": [
+              { "id": "yes", "label": "Yes" },
+              { "id": "no", "label": "No" },
+              { "id": "not_sure", "label": "I'm not sure" }
+            ],
+            "required": true
+          }
+        ]
+      }
+    ]
+  },
+
+  "categories": [
+    {
+      "id": "tpr",
+      "name": "Third-Party Risk",
+      "pilot_depth": "deep",
+      "gate": {
+        "id": "t1_tpr_gate",
+        "text": "Does this activity involve a third party — a vendor, supplier, partner or contractor?",
+        "help": "Anyone outside the organisation who builds, hosts, operates or supports part of this activity.",
+        "options": [
+          { "id": "yes", "label": "Yes" },
+          { "id": "no", "label": "No" },
+          { "id": "not_sure", "label": "I'm not sure" }
+        ]
+      },
+      "prefill_from": {
+        "condition": { "op": "equals", "q": "third_party_involved", "value": "yes" },
+        "value": "yes",
+        "reason": "You told us a third party is involved when you described the activity."
+      }
+    },
+    {
+      "id": "aim",
+      "name": "AI & Model Risk",
+      "pilot_depth": "deep",
+      "gate": {
+        "id": "t1_aim_gate",
+        "text": "Does this activity use AI, machine learning or an automated model to produce an output?",
+        "help": "Including a model inside a product you buy, and a model you call through an API.",
+        "options": [
+          { "id": "yes", "label": "Yes" },
+          { "id": "no", "label": "No" },
+          { "id": "not_sure", "label": "I'm not sure" }
+        ]
+      },
+      "prefill_from": {
+        "condition": { "op": "equals", "q": "uses_ai", "value": "yes" },
+        "value": "yes",
+        "reason": "You told us this activity uses AI when you described it."
+      }
+    },
+    {
+      "id": "priv",
+      "name": "Data & Privacy",
+      "pilot_depth": "deep",
+      "gate": {
+        "id": "t1_priv_gate",
+        "text": "Does this activity handle information about people?",
+        "help": "Customers, employees, candidates, patients — anyone. Including information you only pass through.",
+        "options": [
+          { "id": "yes", "label": "Yes" },
+          { "id": "no", "label": "No" },
+          { "id": "not_sure", "label": "I'm not sure" }
+        ]
+      },
+      "prefill_from": {
+        "condition": { "op": "any_of", "q": "data_classification", "values": ["confidential", "restricted"] },
+        "value": "yes",
+        "reason": "You told us the most sensitive data involved is Confidential or Restricted."
+      }
+    },
+    {
+      "id": "sec",
+      "name": "Security & Resilience",
+      "pilot_depth": "deep",
+      "gate": {
+        "id": "t1_sec_gate",
+        "text": "Does this activity involve a system that stores, processes or transmits our data?",
+        "help": "Almost any technology activity does. Answer No only for something with no system component at all.",
+        "options": [
+          { "id": "yes", "label": "Yes" },
+          { "id": "no", "label": "No" },
+          { "id": "not_sure", "label": "I'm not sure" }
+        ]
+      }
+    },
+    {
+      "id": "arch",
+      "name": "Solution Architecture",
+      "pilot_depth": "gate_only",
+      "gate": {
+        "id": "t1_arch_gate",
+        "text": "Does this activity introduce or change a system's architecture?",
+        "help": "New components, new integrations, a new hosting arrangement, a change to how data flows.",
+        "options": [
+          { "id": "yes", "label": "Yes" },
+          { "id": "no", "label": "No" },
+          { "id": "not_sure", "label": "I'm not sure" }
+        ]
+      },
+      "boundary_note": "Yes records this area's scope for a reviewer and asks nothing further in the pilot. Architecture depth arrives with the next instrument version; recording it now is what puts it in front of the right reviewer."
+    },
+    {
+      "id": "lrc",
+      "name": "Legal, Regulatory & Compliance",
+      "pilot_depth": "gate_only",
+      "gate": {
+        "id": "t1_lrc_gate",
+        "text": "Is this activity subject to a specific law, regulation or contractual obligation?",
+        "help": "If you are not sure, say so — the legal and compliance offices would rather confirm than have you guess.",
+        "options": [
+          { "id": "yes", "label": "Yes" },
+          { "id": "no", "label": "No" },
+          { "id": "not_sure", "label": "I'm not sure" }
+        ]
+      },
+      "boundary_note": "Yes routes this to the compliance office with what you have already told us, and asks nothing further in the pilot."
+    },
+    {
+      "id": "ops",
+      "name": "Operational Risk",
+      "pilot_depth": "gate_only",
+      "gate": {
+        "id": "t1_ops_gate",
+        "text": "Does this activity change how a business process runs day to day?",
+        "help": "A new step, a removed step, a task that moves from a person to a system.",
+        "options": [
+          { "id": "yes", "label": "Yes" },
+          { "id": "no", "label": "No" },
+          { "id": "not_sure", "label": "I'm not sure" }
+        ]
+      },
+      "boundary_note": "Yes records the process change for a reviewer and asks nothing further in the pilot."
+    },
+    {
+      "id": "gov",
+      "name": "Governance & Oversight",
+      "pilot_depth": "gate_only",
+      "always_applies": true,
+      "gate": {
+        "id": "t1_gov_gate",
+        "text": "Governance & Oversight applies to every activity.",
+        "help": "This is not a question. Every activity has an accountable owner and a decision record, so this area is recorded as applying and is not counted in what is left for you to do (G-36).",
+        "options": []
+      },
+      "boundary_note": "Applies · not asked. Recorded as in scope for a reviewer; nothing here is yours to answer."
+    },
+    {
+      "id": "eth",
+      "name": "Ethics & Conduct",
+      "pilot_depth": "gate_only",
+      "gate": {
+        "id": "t1_eth_gate",
+        "text": "Could this activity affect people in a way they would object to if they knew?",
+        "help": "Differential treatment, surveillance, a decision made about someone without their knowledge. An honest Yes is not an admission — it is what gets a specialist involved early.",
+        "options": [
+          { "id": "yes", "label": "Yes" },
+          { "id": "no", "label": "No" },
+          { "id": "not_sure", "label": "I'm not sure" }
+        ]
+      },
+      "boundary_note": "Yes records the concern in your own words for the ethics reviewer and asks nothing further in the pilot. This area deliberately stops here rather than putting a rubric between you and a specialist."
+    },
+    {
+      "id": "ppl",
+      "name": "People & Capacity",
+      "pilot_depth": "gate_only",
+      "gate": {
+        "id": "t1_ppl_gate",
+        "text": "Does this activity depend on people or skills we do not currently have?",
+        "help": "New hires, a new specialism, or a team already at capacity.",
+        "options": [
+          { "id": "yes", "label": "Yes" },
+          { "id": "no", "label": "No" },
+          { "id": "not_sure", "label": "I'm not sure" }
+        ]
+      },
+      "boundary_note": "Yes records the dependency for a reviewer and asks nothing further in the pilot."
+    },
+    {
+      "id": "jur",
+      "name": "Jurisdiction-Bound Execution",
+      "pilot_depth": "gate_only",
+      "gate": {
+        "id": "t1_jur_gate",
+        "text": "Will any part of this activity be carried out from, or its data held in, another country?",
+        "help": "Where the work happens and where the data sits, not where the vendor is headquartered.",
+        "options": [
+          { "id": "yes", "label": "Yes" },
+          { "id": "no", "label": "No" },
+          { "id": "not_sure", "label": "I'm not sure" }
+        ]
+      },
+      "boundary_note": "Yes records the jurisdictions for a reviewer and asks nothing further in the pilot; the data-transfer question itself is asked under Data & Privacy, where it routes."
+    }
+  ],
+
+  "tier1_questions": [
+    {
+      "id": "t1_tpr_1",
+      "category": "tpr",
+      "text": "What will the third party do for you?",
+      "help": "Choose everything that applies. Each one opens a different set of questions, and choosing nothing here is not a way to skip them — it just means nobody knows what they do.",
+      "type": "multi_select",
+      "options": [
+        { "id": "hosts_data", "label": "Hosts or stores our data" },
+        { "id": "accesses_systems", "label": "Connects to or logs in to our systems" },
+        { "id": "processes_personal", "label": "Handles information about people on our behalf" },
+        { "id": "critical_process", "label": "Runs something we could not operate without" },
+        { "id": "subcontracts", "label": "Uses their own suppliers to deliver part of it" },
+        { "id": "offshore_delivery", "label": "Delivers the work from outside our home country" },
+        { "id": "something_else", "label": "Something else" }
+      ],
+      "unlisted_text_field": "t1_tpr_1_other"
+    },
+    {
+      "id": "t1_tpr_2",
+      "category": "tpr",
+      "text": "How will the third party reach our systems?",
+      "help": "Only asked because you said they connect to or log in to our systems. If you do not know yet, hand this question off rather than guessing.",
+      "type": "multi_select",
+      "display_when": { "op": "includes", "q": "t1_tpr_1", "value": "accesses_systems" },
+      "options": [
+        { "id": "named_accounts", "label": "Their staff get their own named accounts" },
+        { "id": "shared_account", "label": "They share one account between people" },
+        { "id": "admin_rights", "label": "They need administrator or privileged rights" },
+        { "id": "api_integration", "label": "System to system, over an API" },
+        { "id": "vpn_network", "label": "Onto our network, over a VPN or a private link" }
+      ]
+    },
+    {
+      "id": "t1_aim_1",
+      "category": "aim",
+      "text": "What does the AI do in this activity?",
+      "help": "Choose everything that applies. The difference between suggesting to a person and acting on its own is the single most important thing on this page.",
+      "type": "multi_select",
+      "options": [
+        { "id": "suggests_to_person", "label": "Suggests something a person then decides" },
+        { "id": "drafts_content", "label": "Drafts content a person reviews before it goes out" },
+        { "id": "decides_automatically", "label": "Makes a decision without a person in the loop" },
+        { "id": "takes_actions", "label": "Takes actions in other systems on its own" },
+        { "id": "classifies_ranks", "label": "Classifies, scores or ranks people or cases" },
+        { "id": "something_else", "label": "Something else" }
+      ],
+      "unlisted_text_field": "t1_aim_1_other"
+    },
+    {
+      "id": "t1_aim_2",
+      "category": "aim",
+      "text": "Where does the model come from?",
+      "help": "If a vendor's product does the AI part and you cannot see inside it, choose the vendor option — that is a real and common answer, not a gap.",
+      "type": "single_select",
+      "options": [
+        { "id": "built_in_house", "label": "We built and trained it ourselves" },
+        { "id": "foundation_api", "label": "A commercial model we call through an API" },
+        { "id": "open_weights", "label": "An open-weights model we host ourselves" },
+        { "id": "inside_vendor_product", "label": "It is inside a product we buy, and we cannot see inside it" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t1_aim_3",
+      "category": "aim",
+      "text": "What does the model see to do its job?",
+      "help": "What goes in at the point of use — prompts, retrieved documents, records from a database. Not what it was originally trained on.",
+      "type": "multi_select",
+      "options": [
+        { "id": "personal_data", "label": "Information about people" },
+        { "id": "confidential_business", "label": "Confidential business information" },
+        { "id": "public_only", "label": "Only information that is already public" },
+        { "id": "customer_content", "label": "Content our customers gave us" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t1_priv_1",
+      "category": "priv",
+      "text": "Whose information is involved?",
+      "help": "Choose everyone whose information this activity touches, including people who are not our customers.",
+      "type": "multi_select",
+      "options": [
+        { "id": "customers", "label": "Customers or prospective customers" },
+        { "id": "employees", "label": "Employees, candidates or contractors" },
+        { "id": "third_party_individuals", "label": "People at other organisations" },
+        { "id": "children", "label": "Children or young people" },
+        { "id": "something_else", "label": "Something else" }
+      ],
+      "unlisted_text_field": "t1_priv_1_other"
+    },
+    {
+      "id": "t1_priv_2",
+      "category": "priv",
+      "text": "Does any of it fall into a specially protected category?",
+      "help": "Health, biometrics, genetics, race or ethnicity, religion, political opinions, trade union membership, sexual orientation, criminal records. If any of these appear even incidentally, say so.",
+      "type": "multi_select",
+      "options": [
+        { "id": "health", "label": "Health or medical information" },
+        { "id": "biometric", "label": "Biometric or genetic information" },
+        { "id": "protected_characteristics", "label": "Race, ethnicity, religion or political opinions" },
+        { "id": "criminal", "label": "Criminal offences or convictions" },
+        { "id": "financial_hardship", "label": "Financial hardship or vulnerability" },
+        { "id": "none", "label": "None of these" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t1_priv_3",
+      "category": "priv",
+      "text": "Will information about people leave the country it is held in today?",
+      "help": "Including a vendor support team viewing it from another country. Viewing counts as a transfer.",
+      "type": "single_select",
+      "options": [
+        { "id": "yes", "label": "Yes" },
+        { "id": "no", "label": "No" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t1_sec_1",
+      "category": "sec",
+      "text": "How is the system reachable?",
+      "help": "Choose everything that applies. Anything reachable from the public internet is treated differently from something only reachable inside our network.",
+      "type": "multi_select",
+      "options": [
+        { "id": "public_internet", "label": "From the public internet" },
+        { "id": "internal_only", "label": "Only from inside our network" },
+        { "id": "customer_facing", "label": "Customers log in to it directly" },
+        { "id": "partner_api", "label": "Partners call it over an API" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t1_sec_2",
+      "category": "sec",
+      "text": "Who will hold administrator or privileged access?",
+      "help": "Privileged access means being able to change the system itself or read all of its data, not just use it.",
+      "type": "multi_select",
+      "options": [
+        { "id": "our_staff", "label": "Our own staff" },
+        { "id": "vendor_staff", "label": "The vendor's staff" },
+        { "id": "shared_credentials", "label": "Accounts shared between people" },
+        { "id": "automated_service", "label": "Automated processes, using their own credentials" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    },
+    {
+      "id": "t1_sec_3",
+      "category": "sec",
+      "text": "How quickly would the business need this back after an outage?",
+      "help": "Your honest operational expectation, not an ambition. This sets what recovery evidence you will be asked for.",
+      "type": "single_select",
+      "options": [
+        { "id": "under_1h", "label": "Within an hour" },
+        { "id": "under_1d", "label": "Within a day" },
+        { "id": "under_1w", "label": "Within a week" },
+        { "id": "longer", "label": "Longer than a week is tolerable" },
+        { "id": "not_sure", "label": "I'm not sure" }
+      ]
+    }
+  ],
+
+  "paths": [
+    { "code": "TPR_LA", "name": "Third-Party Logical Access", "category": "tpr",
+      "activated_by": [
+        { "condition": { "op": "includes", "q": "t1_tpr_1", "value": "accesses_systems" }, "reason": "the third party connects to or logs in to our systems" },
+        { "condition": { "op": "includes", "q": "t1_sec_2", "value": "vendor_staff" }, "reason": "the vendor's staff will hold privileged access" }
+      ] },
+    { "code": "TPR_DS", "name": "Third-Party Data Sharing", "category": "tpr",
+      "activated_by": [
+        { "condition": { "op": "includes", "q": "t1_tpr_1", "value": "hosts_data" }, "reason": "the third party hosts or stores our data" },
+        { "condition": { "op": "includes", "q": "t1_tpr_1", "value": "processes_personal" }, "reason": "the third party handles information about people on our behalf" }
+      ] },
+    { "code": "TPR_FP", "name": "Fourth-Party Dependency", "category": "tpr",
+      "activated_by": [
+        { "condition": { "op": "includes", "q": "t1_tpr_1", "value": "subcontracts" }, "reason": "the third party uses their own suppliers to deliver part of this" }
+      ] },
+    { "code": "TPR_BC", "name": "Third-Party Business Continuity", "category": "tpr",
+      "activated_by": [
+        { "condition": { "op": "includes", "q": "t1_tpr_1", "value": "critical_process" }, "reason": "the third party runs something we could not operate without" }
+      ] },
+    { "code": "TPR_CC", "name": "Third-Party Contractual Coverage", "category": "tpr",
+      "activated_by": [
+        { "condition": { "op": "equals", "q": "t1_tpr_gate", "value": "yes" }, "reason": "a third party is involved, so the contract has to carry our requirements" }
+      ] },
+    { "code": "TPR_OS", "name": "Offshore Delivery", "category": "tpr",
+      "activated_by": [
+        { "condition": { "op": "includes", "q": "t1_tpr_1", "value": "offshore_delivery" }, "reason": "the third party delivers the work from outside our home country" }
+      ] },
+
+    { "code": "AIM_AA", "name": "Agentic Autonomy", "category": "aim",
+      "activated_by": [
+        { "condition": { "op": "includes", "q": "t1_aim_1", "value": "decides_automatically" }, "reason": "the AI makes a decision without a person in the loop" },
+        { "condition": { "op": "includes", "q": "t1_aim_1", "value": "takes_actions" }, "reason": "the AI takes actions in other systems on its own" }
+      ] },
+    { "code": "AIM_MP", "name": "Model Provenance & Supply Chain", "category": "aim",
+      "activated_by": [
+        { "condition": { "op": "any_of", "q": "t1_aim_2", "values": ["foundation_api", "open_weights", "inside_vendor_product"] }, "reason": "the model comes from outside our organisation" }
+      ] },
+    { "code": "AIM_TD", "name": "Training & Inference Data Exposure", "category": "aim",
+      "activated_by": [
+        { "condition": { "op": "includes", "q": "t1_aim_3", "value": "personal_data" }, "reason": "the model sees information about people at the point of use" },
+        { "condition": { "op": "includes", "q": "t1_aim_3", "value": "confidential_business" }, "reason": "the model sees confidential business information" },
+        { "condition": { "op": "includes", "q": "t1_aim_3", "value": "customer_content" }, "reason": "the model sees content our customers gave us" }
+      ] },
+    { "code": "AIM_OR", "name": "Output Reliability", "category": "aim",
+      "activated_by": [
+        { "condition": { "op": "includes", "q": "t1_aim_1", "value": "drafts_content" }, "reason": "the AI drafts content that a person sends onward" },
+        { "condition": { "op": "includes", "q": "t1_aim_1", "value": "classifies_ranks" }, "reason": "the AI classifies, scores or ranks people or cases" }
+      ] },
+    { "code": "AIM_HO", "name": "Human Oversight & Escalation", "category": "aim",
+      "activated_by": [
+        { "condition": { "op": "equals", "q": "t1_aim_gate", "value": "yes" }, "reason": "the activity uses AI, so somebody has to be able to see and stop what it does" }
+      ] },
+
+    { "code": "PRIV_PI", "name": "Personal Information Processing", "category": "priv",
+      "activated_by": [
+        { "condition": { "op": "equals", "q": "t1_priv_gate", "value": "yes" }, "reason": "the activity handles information about people" }
+      ] },
+    { "code": "PRIV_SC", "name": "Special Category Data", "category": "priv",
+      "activated_by": [
+        { "condition": { "op": "any_of", "q": "t1_priv_2", "values": ["health", "biometric", "protected_characteristics", "criminal", "financial_hardship"] }, "reason": "specially protected information about people is involved" },
+        { "condition": { "op": "includes", "q": "t1_priv_1", "value": "children" }, "reason": "children's or young people's information is involved" }
+      ] },
+    { "code": "PRIV_XB", "name": "Cross-Border Data Transfer", "category": "priv",
+      "activated_by": [
+        { "condition": { "op": "equals", "q": "t1_priv_3", "value": "yes" }, "reason": "information about people will leave the country it is held in today" },
+        { "condition": { "op": "includes", "q": "t1_tpr_1", "value": "offshore_delivery" }, "reason": "the third party delivers from outside our home country, so they will view data from there" }
+      ] },
+    { "code": "PRIV_RD", "name": "Data Retention & Deletion", "category": "priv",
+      "activated_by": [
+        { "condition": { "op": "equals", "q": "t1_priv_gate", "value": "yes" }, "reason": "information about people is involved, so how long it is kept has to be decided" }
+      ] },
+    { "code": "PRIV_IR", "name": "Individual Rights Fulfilment", "category": "priv",
+      "activated_by": [
+        { "condition": { "op": "any_of", "q": "t1_priv_1", "values": ["customers", "employees", "third_party_individuals", "children"] }, "reason": "identifiable people are involved, and they can ask what we hold about them" }
+      ] },
+
+    { "code": "SEC_PA", "name": "Privileged Access Management", "category": "sec",
+      "activated_by": [
+        { "condition": { "op": "any_of", "q": "t1_sec_2", "values": ["vendor_staff", "shared_credentials", "automated_service"] }, "reason": "privileged access is held by someone other than a named member of our own staff" },
+        { "condition": { "op": "includes", "q": "t1_tpr_2", "value": "admin_rights" }, "reason": "the third party needs administrator or privileged rights" }
+      ] },
+    { "code": "SEC_IE", "name": "Internet Exposure & Boundary", "category": "sec",
+      "activated_by": [
+        { "condition": { "op": "includes", "q": "t1_sec_1", "value": "public_internet" }, "reason": "the system is reachable from the public internet" },
+        { "condition": { "op": "includes", "q": "t1_sec_1", "value": "customer_facing" }, "reason": "customers log in to the system directly" }
+      ] },
+    { "code": "SEC_LD", "name": "Logging & Detection Coverage", "category": "sec",
+      "activated_by": [
+        { "condition": { "op": "equals", "q": "t1_sec_gate", "value": "yes" }, "reason": "a system holds our data, so what happens to it has to be recordable" }
+      ] },
+    { "code": "SEC_RB", "name": "Recovery & Backup Assurance", "category": "sec",
+      "activated_by": [
+        { "condition": { "op": "any_of", "q": "t1_sec_3", "values": ["under_1h", "under_1d"] }, "reason": "the business expects this back within a day of an outage" },
+        { "condition": { "op": "includes", "q": "t1_tpr_1", "value": "critical_process" }, "reason": "the third party runs something we could not operate without" }
+      ] },
+    { "code": "SEC_CR", "name": "Change & Release Integrity", "category": "sec",
+      "activated_by": [
+        { "condition": { "op": "equals", "q": "initiative_type", "value": "new" }, "reason": "this is something new, so how it gets built and released is in scope" },
+        { "condition": { "op": "includes", "q": "t1_sec_1", "value": "public_internet" }, "reason": "the system is internet-facing, so a bad release is reachable by anyone" }
+      ] }
+  ]
+}

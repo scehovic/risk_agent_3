@@ -1,0 +1,8 @@
+.venv/
+.build/
+cdk.out/
+__pycache__/
+*.pyc
+.DS_Store
+/tmp-*
+deploy/.build/

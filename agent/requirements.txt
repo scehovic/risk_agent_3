@@ -1,0 +1,12 @@
+# Risk Advisor agent runtime dependencies.
+# Versions come from the shared constraints file so a rebuild months from now produces
+# the image that was tested — do not pin them here.
+-c constraints.txt
+strands-agents
+bedrock-agentcore
+mcp
+boto3
+# AgentCore observability: ADOT (OpenTelemetry) instrumentation. Installing this is NOT
+# sufficient on its own — the container must LAUNCH under `opentelemetry-instrument`
+# (see the Dockerfile CMD) or zero spans are emitted and the failure is silent.
+aws-opentelemetry-distro

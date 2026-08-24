@@ -1,0 +1,48 @@
+{
+  "_comment": "Portfolio memory seed — what gets written into the AgentCore Memory CUSTOM strategy namespace. SPEC G-21, §22.4, and every one of its four rules is structural here rather than a hope. (1) NO PRECEDENT LAUNDERING: every row is built only from ATTESTED answers; `attested_count` is the whole population, and drafts, pre-fills and unconfirmed values are invisible to it. (2) AGGREGATE, NEVER DISCLOSE: rows carry counts only — no project name, no owner, no other team's content — and a row below `minimum_comparable_count` is dropped entirely, because a precedent drawn from one assessment is gossip, not evidence, and it also leaks who. (3) NO ANCHORING: `never_preselect` is true and the phrasing is 'how others answered', never a recommendation to argue with. (4) AGE IS PART OF THE FACT: every row carries how many and how recently.",
+  "version": "2026-08-24.1",
+
+  "rules": {
+    "attested_only": true,
+    "minimum_comparable_count": 5,
+    "never_preselect": true,
+    "show_age": true,
+    "reviewer_divergence_only": true,
+    "divergence_note": "A divergence is a triage signal for the reviewer, never pressure on the requester toward the majority. Being different is often correct."
+  },
+
+  "aggregates": [
+    { "question": "t3_iam_01", "comparable_on": "third party accesses our systems",
+      "attested_count": 23, "answers": { "yes": 18, "partial": 3, "no": 2 },
+      "most_recent": "2026-08-11", "oldest": "2025-03-04" },
+    { "question": "t3_iam_02", "comparable_on": "third party holds privileged access",
+      "attested_count": 19, "answers": { "yes": 11, "partial": 5, "no": 3 },
+      "most_recent": "2026-08-06", "oldest": "2025-01-22" },
+    { "question": "t3_iam_06", "comparable_on": "third party reaches our systems over a VPN",
+      "attested_count": 14, "answers": { "yes": 12, "partial": 1, "no": 1 },
+      "most_recent": "2026-07-29", "oldest": "2025-05-13" },
+    { "question": "t3_aig_01", "comparable_on": "activity uses AI",
+      "attested_count": 31, "answers": { "yes": 27, "no": 4 },
+      "most_recent": "2026-08-20", "oldest": "2025-09-01" },
+    { "question": "t3_aig_03", "comparable_on": "AI output travels onward to a colleague or customer",
+      "attested_count": 17, "answers": { "yes": 9, "partial": 5, "no": 3 },
+      "most_recent": "2026-08-14", "oldest": "2025-11-07" },
+    { "question": "t3_res_02", "comparable_on": "business expects recovery within a day",
+      "attested_count": 26, "answers": { "yes": 15, "partial": 4, "no": 7 },
+      "most_recent": "2026-08-18", "oldest": "2025-02-19" },
+    { "question": "t3_priv_03", "comparable_on": "personal information held by a third party",
+      "attested_count": 21, "answers": { "yes": 13, "partial": 5, "no": 3 },
+      "most_recent": "2026-08-12", "oldest": "2025-04-30" },
+    { "question": "t3_tp_03", "comparable_on": "third party processes Confidential data or above",
+      "attested_count": 28, "answers": { "yes": 20, "partial": 6, "no": 2 },
+      "most_recent": "2026-08-21", "oldest": "2025-01-15" },
+    { "question": "t1_tpr_gate", "comparable_on": "vendor named in intake",
+      "attested_count": 47, "answers": { "yes": 45, "no": 2 },
+      "most_recent": "2026-08-22", "oldest": "2024-11-02" },
+    { "question": "t3_dp_04", "comparable_on": "third party holds Confidential data or above",
+      "attested_count": 3, "answers": { "yes": 2, "partial": 1 },
+      "most_recent": "2026-06-02", "oldest": "2026-01-18",
+      "_dropped": true,
+      "_dropped_because": "attested_count is below minimum_comparable_count (5). Kept in the seed file so the floor is visible and testable; the engine must never surface this row." }
+  ]
+}
